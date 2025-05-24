@@ -1,513 +1,794 @@
 <!DOCTYPE html>
-<html lang="de">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>t-server.org</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700&display=swap" rel="stylesheet">
     <style>
-        /* Grundlegende Stile für die Schriftart */
+        /* CSS variables for easy Dark Mode theme customization */
+        :root {
+            --background-color: #121212; /* Very dark background */
+            --text-color: #e0e0e0; /* Light text color */
+            --primary-color: #8be9fd; /* Accent color for links and important elements */
+            --secondary-color: #50fa7b; /* Hover color */
+            --header-footer-bg: rgba(20, 20, 20, 0.7); /* Semi-transparent dark grey */
+            --dropdown-bg: rgba(30, 30, 30, 0.9); /* Darker, less transparent dropdown background */
+            --border-color: rgba(255, 255, 255, 0.1); /* Subtle border color */
+            
+            /* New variables for button layout */
+            --button-base-size: 180px; /* Base size for buttons on desktop */
+            --button-gap: 20px; /* Gap between buttons and rows */
+            --side-padding: 2rem; /* Standard padding from screen edges */
+        }
+
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #000000; /* Standard schwarzer Hintergrund */
-            cursor: default; /* Standard-Cursor, um die Interaktion zu betonen */
+            margin: 0;
+            padding: 0;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            position: relative; /* Important for the background image pseudo-element */
+            overflow-x: hidden; /* Prevents horizontal scrollbars */
         }
 
-        /* Canvas-Stile für den einzigen Canvas-Layer */
-        #mainCanvas {
-            position: fixed; /* Fixiert die Canvas im Hintergrund */
+        /* Generic dark background image with overlay */
+        body::before {
+            content: '';
+            position: fixed; /* Fixed so it stays when scrolling */
             top: 0;
             left: 0;
-            width: 100vw;
-            height: 100vh;
-            z-index: 10; /* Sorgt dafür, dass die Canvas VOR den HTML-Elementen liegt */
-            pointer-events: none; /* Ermöglicht Klicks auf Elemente darunter */
+            width: 100%;
+            height: 100%;
+            /* Example image: Dark, abstract texture. Can be replaced. */
+            background-image: url('https://images.pexels.com/photos/998641/pexels-photo-998641.jpeg'); /* Placeholder, ideally a real, dark image */
+            background-size: cover;
+            background-position: center;
+            filter: brightness(0.3) contrast(1.2); /* Makes it darker and more contrasting */
+            z-index: -1; /* Behind the content */
+            animation: fadeInBackground 1.5s ease-out forwards; /* Smooth background fade-in */
         }
 
-        /* Zusätzliche Stile für Bilder innerhalb der Schaltflächen */
-        .button img {
+        @keyframes fadeInBackground {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        /* Canvas for particles - positioned behind all content */
+        #particleCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0; /* Behind header, main, footer (which are z-index 1 or higher) */
+        }
+
+        /* Header style */
+        header {
+            background-color: var(--header-footer-bg);
+            padding: 1rem var(--side-padding);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            backdrop-filter: blur(8px); /* Blur for the semi-transparent effect */
+            border-bottom: 1px solid var(--border-color);
+            position: sticky; /* Stays at the top when scrolling */
+            top: 0;
+            z-index: 100; /* Ensures the header is above other content */
+            /* Combines depth shadow with the new glow effect */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2), 0 0 15px rgba(139, 233, 253, 0.4); /* Light shadow + Glow effect */
+            /* Removed curves, header is now rectangular again */
+            border-radius: 0; 
+        }
+
+        .site-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--text-color);
+            text-decoration: none;
+            transition: color 0.3s ease;
+            border-radius: 5px; /* Rounded corners */
+        }
+
+        .site-title:hover {
+            color: var(--primary-color);
+        }
+
+        /* Navigation style */
+        nav {
+            position: relative;
+        }
+
+        .nav-toggle {
+            /* Hamburger icon is always visible to trigger the dropdown menu */
+            display: block; 
+            background: none;
+            border: none;
+            color: var(--text-color);
+            font-size: 2rem;
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+
+        .nav-toggle:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .nav-links {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            display: none; /* Hidden by default for the dropdown behavior */
+            flex-direction: column; /* Stacks links vertically in dropdown */
+            position: absolute;
+            top: 100%; /* Positions below the header */
+            right: 0; /* Aligns to the right */
+            background-color: var(--dropdown-bg);
+            min-width: 180px;
+            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.5);
+            z-index: 10; /* Above other content */
+            border-radius: 8px;
+            overflow: hidden;
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--border-color);
+            animation: slideInDropdown 0.3s ease-out forwards;
+            transform-origin: top right;
+        }
+
+        .nav-links.active {
+            display: flex; /* Shows the dropdown when active */
+        }
+
+        .nav-links li {
+            width: 100%; /* Full width within dropdown */
+            text-align: left; /* Align text within dropdown links */
+        }
+
+        .nav-links a {
+            color: var(--text-color);
+            text-decoration: none;
+            padding: 12px 16px; /* Padding for dropdown links */
             display: block;
-            margin: 0 auto 8px auto; /* Zentriert das Bild und fügt Abstand nach unten hinzu */
-            max-width: 64px; /* Maximale Breite des Bildes */
-            height: auto; /* Höhe automatisch anpassen */
-            border-radius: 4px; /* Leichte Abrundung für die Bilder */
+            transition: background-color 0.3s ease, color 0.3s ease;
         }
 
-        /* Textschatten für den Haupttext */
-        main h2, main p {
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7); /* Subtiler schwarzer Schatten */
+        .nav-links a:hover {
+            background-color: rgba(255, 255, 255, 0.08);
+            color: var(--primary-color);
         }
 
-        /* Animation für Buttons im Ruhezustand */
-        @keyframes button-float {
-            0% { transform: translateY(0px); }
-            50% { transform: translateY(-5px); }
-            100% { transform: translateY(0px); }
+        @keyframes slideInDropdown {
+            from { opacity: 0; transform: scaleY(0.8) translateY(-10px); }
+            to { opacity: 1; transform: scaleY(1) translateY(0); }
         }
 
-        /* Farbanimation für Buttons */
-        @keyframes button-color-change {
-            0% { background-color: #F8F8FF; }
-            10% { background-color: #FFF0F5; }
-            20% { background-color: #F0F8FF; }
-            30% { background-color: #F0FFFF; }
-            40% { background-color: #E6E6FA; }
-            50% { background-color: #ADD8E6; }
-            60% { background-color: #AFEEEE; }
-            70% { background-color: #E0FFFF; }
-            80% { background-color: #D8BFD8; }
-            90% { background-color: #B0E0E6; }
-            100% { background-color: #F8F8FF; }
+        /* Main content area */
+        main {
+            flex-grow: 1; /* Takes up remaining space */
+            padding: 4rem var(--side-padding); /* Padding from screen edges */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            position: relative; /* For z-index in case of overlap */
+            z-index: 1; /* Above the background image */
         }
 
-        /* Mobile-first: Standardstile für Buttons (quadratisch, zentriert, kein Padding, keine Animation) */
-        .button {
-            width: 8rem; /* 128px */
-            height: 8rem; /* 128px */
-            padding: 0; /* Entfernt Padding, da Größe fixiert ist */
-            margin-left: auto; /* Zentriert horizontal */
-            margin-right: auto; /* Zentriert horizontal */
-            animation: none !important; /* Deaktiviert alle Animationen auf Mobilgeräten */
-            background-color: rgba(75, 85, 99, 0.8); /* Standardfarbe für Mobilgeräte (gray-800/80) */
-            transition: background-color 0.3s ease-in-out; /* Sanfter Hover-Übergang */
+        /* Wrapper for buttons (now a Grid container) */
+        .button-grid-container {
+            display: grid;
+            gap: var(--button-gap);
+            justify-content: center; /* Centers grid items horizontally */
+            align-items: center;
+            width: 100%; /* Takes full width of main padding */
+            max-width: calc(3 * var(--button-base-size) + 2 * var(--button-gap)); /* Standard max-width for 3 buttons */
+            margin: 0 auto; /* Centers the wrapper */
+            animation: slideInContent 0.8s ease-out forwards;
+            opacity: 0;
+
+            /* Default Desktop: 3 columns, auto-fits */
+            grid-template-columns: repeat(auto-fit, minmax(var(--button-base-size), 1fr));
+            grid-auto-rows: var(--button-base-size); /* Makes rows square */
         }
 
-        .button:hover {
-            background-color: rgba(75, 85, 99, 0.8); /* Entspricht Tailwind gray-700/80 */
+        @keyframes slideInContent {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
-        /* Erhöht den vertikalen Abstand für das Grid auf Mobilgeräten */
-        .grid {
-            gap: 2rem !important; /* Überschreibt Tailwind's gap-6 mit gap-8 (32px) */
+        /* Style for action buttons */
+        .action-button {
+            background-color: rgba(40, 40, 40, 0.7); /* Slightly lighter transparent background */
+            color: var(--text-color);
+            text-decoration: none;
+            padding: 1rem; /* Padding inside the button */
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 10px; /* Gap between icon and text */
+            transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.05); /* Subtle border */
+            
+            /* Makes the button square */
+            aspect-ratio: 1 / 1;
+            /* Controls button width based on number in row */
+            width: 100%; /* Fills available column width */
+            max-width: var(--button-base-size); /* Max width for desktop */
+            box-sizing: border-box; /* Include padding in width */
         }
 
-        /* Desktop-Stile: Überschreiben der mobilen Stile ab 640px (sm breakpoint) */
-        @media (min-width: 640px) {
-            .button {
-                width: auto; /* Zurück zu automatischer Breite */
-                height: auto; /* Zurück zu automatischer Höhe */
-                padding-top: 1rem; /* py-4 */
-                padding-bottom: 1rem; /* py-4 */
-                padding-left: 1.5rem; /* px-6 */
-                padding-right: 1.5rem; /* px-6 */
-                margin-left: unset; /* Entfernt auto margins */
-                margin-right: unset; /* Entfernt auto margins */
-                animation: button-float 4s ease-in-out infinite, button-color-change 20s linear infinite; /* Animationen aktivieren */
+        .action-button:hover {
+            background-color: rgba(60, 60, 60, 0.8); /* Darker on hover */
+            transform: translateY(-5px); /* Lift effect */
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4); /* More prominent shadow */
+            color: var(--secondary-color); /* Text color changes on hover */
+        }
+
+        .button-icon {
+            width: 60px; /* Icon size */
+            height: 60px;
+            object-fit: contain; /* Ensures the image fits */
+            border-radius: 5px; /* Slightly rounded icon corners */
+            filter: drop-shadow(0 0 5px rgba(139, 233, 253, 0.3)); /* Subtle glow effect */
+        }
+
+        .action-button span {
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        /* Footer style */
+        footer {
+            background-color: var(--header-footer-bg);
+            padding: 1.5rem var(--side-padding);
+            text-align: center;
+            font-size: 0.9rem;
+            color: var(--text-color);
+            border-top: 1px solid var(--border-color);
+            backdrop-filter: blur(8px); /* Blur for the semi-transparent effect */
+            /* Combines depth shadow with the new glow effect */
+            box-shadow: 0 -4px 8px rgba(0, 0, 0, 0.2), 0 0 15px rgba(139, 233, 253, 0.4); /* Light shadow + Glow effect */
+            /* Removed curves, footer is now rectangular again */
+            border-radius: 0;
+        }
+
+        footer a {
+            color: var(--primary-color);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        footer a:hover {
+            color: var(--secondary-color);
+        }
+
+        /* Responsive design for smaller screens */
+
+        /* Breakpoint for 2 buttons per row */
+        @media (max-width: 1000px) {
+            .button-grid-container {
+                /* Forces 2 columns when there's not enough space for 3 */
+                grid-template-columns: repeat(auto-fit, minmax(calc(var(--button-base-size) * 0.8), 1fr));
+                max-width: calc(2 * var(--button-base-size) + 1 * var(--button-gap)); /* Max width for 2 buttons */
             }
-            /* Versetzte Startzeiten für die Farbanimation */
-            .button:nth-child(1) { animation-delay: 0s, 0s; } /* float-delay, color-delay */
-            .button:nth-child(2) { animation-delay: 0.2s, -5s; }
-            .button:nth-child(3) { animation-delay: 0.4s, -10s; }
-            .button:nth-child(4) { animation-delay: 0.6s, -15s; }
+        }
 
-            /* Setzt den Grid-Abstand für Desktop zurück auf den Standard (gap-6) */
-            .grid {
-                gap: 1.5rem !important; /* Default gap-6 is 1.5rem */
+        /* Breakpoint for 1 button per row (Mobile) */
+        @media (max-width: 700px) {
+            header {
+                flex-wrap: wrap;
+                justify-content: space-between;
+                padding: 1rem;
+                /* Removed curves on small screens */
+                border-radius: 0; 
             }
-        }
 
-        /* Stil für den Partikel im Titel (noch weniger verschwommen) */
-        .title-particle {
-            display: inline-block; /* Damit es neben dem Text bleibt */
-            width: 30px; /* Größe des Partikels */
-            height: 30px;
-            border-radius: 50%; /* Rund */
-            background-color: #E6E6FA; /* Eine der Pastellfarben (Lavender) */
-            filter: blur(0.01px); /* Fast keine Unschärfe für den Vordergrund-Eindruck */
-            box-shadow: 0 0 10px 3px #E6E6FA; /* Leuchten, etwas weniger stark als zuvor */
-            position: relative; /* Für die Animation */
-            top: 2px; /* Leichte vertikale Ausrichtung */
-            margin-right: 8px; /* Abstand zum Text */
-            animation: title-particle-float 3s ease-in-out infinite alternate; /* Sanfte Bewegung */
-        }
+            .site-title {
+                font-size: 1.5rem;
+                margin-bottom: 0;
+            }
 
-        @keyframes title-particle-float {
-            0% { transform: translateY(0px) translateX(0px); }
-            25% { transform: translateY(-3px) translateX(3px); } /* Angepasste Bewegung für größere Größe */
-            50% { transform: translateY(0px) translateX(0px); }
-            75% { transform: translateY(3px) translateX(-3px); } /* Angepasste Bewegung für größere Größe */
-            100% { transform: translateY(0px) translateX(0px); }
+            /* Mobile navigation links */
+            .nav-links {
+                /* On mobile, nav-links acts as the full-width dropdown */
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0; /* Spans full width */
+                width: 100%;
+                border-radius: 0 0 8px 8px; /* Rounded bottom corners */
+                border-top: 1px solid var(--border-color);
+            }
+
+            .nav-links li {
+                border-bottom: 1px solid rgba(255,255,255,0.05); /* Subtle separator */
+            }
+            .nav-links li:last-child {
+                border-bottom: none;
+            }
+
+            .nav-links a {
+                padding: 1rem; /* Larger touch targets */
+                text-align: center; /* Center text in mobile dropdown */
+            }
+
+            /* Adjustments for buttons on very small screens */
+            .button-grid-container {
+                grid-template-columns: 1fr; /* One column */
+                max-width: 300px; /* Narrower for mobile view to maintain spacing */
+                padding: 0; /* Wrapper has no extra padding here, as Main already has it */
+            }
+            .action-button {
+                flex-direction: row; /* Icon and text side-by-side */
+                justify-content: flex-start; /* Left-aligned */
+                padding: 0.8rem 1rem;
+                aspect-ratio: auto; /* Not square in this view */
+                flex-basis: 100%; /* Fills available width */
+                max-width: 100%; /* Reset max-width */
+            }
+            .button-icon {
+                width: 40px;
+                height: 40px;
+                margin-right: 10px;
+            }
+            .action-button span {
+                font-size: 1rem;
+            }
+
+            footer {
+                /* Removed curves on small screens */
+                border-radius: 0;
+            }
         }
     </style>
 </head>
-<body class="text-white min-h-screen flex flex-col">
-
-    <header class="bg-gray-950/80 text-white p-4 md:p-6 flex flex-col md:flex-row justify-between items-center rounded-b-lg shadow-lg backdrop-blur-sm relative">
-        <h1 class="text-3xl md:text-4xl font-bold text-indigo-400 mb-4 md:mb-0 flex items-center tracking-wider">
-            <span class="title-particle"></span>
-            t-server.org
-        </h1>
-        
-        <button id="mobile-menu-button" class="md:hidden text-white focus:outline-none absolute top-4 right-4 z-20">
-            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
-            </svg>
-        </button>
-
-        <nav id="main-nav" class="hidden md:flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-8 mt-4 md:mt-0 w-full md:w-auto absolute md:relative top-full left-0 bg-gray-950/90 md:bg-transparent p-4 md:p-0 rounded-b-lg shadow-lg md:shadow-none">
-            <ul class="flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-8">
-                <li><a href="#impressum" class="text-white hover:text-indigo-400 font-semibold transition-colors duration-300 block py-2 px-4 md:py-0 md:px-0 rounded-md md:rounded-none">Impressum</a></li>
-                <li><a href="#kontakt" class="text-white hover:text-indigo-400 font-semibold transition-colors duration-300 block py-2 px-4 md:py-0 md:px-0 rounded-md md:rounded-none">Kontakt</a></li>
-                <li><a href="#ueber-mich" class="text-white hover:text-indigo-400 font-semibold transition-colors duration-300 block py-2 px-4 md:py-0 md:px-0 rounded-md md:rounded-none">Über mich</a></li>
+<body>
+    <canvas id="particleCanvas"></canvas>
+    <header>
+        <a href="/" class="site-title">t-server.org</a>
+        <nav>
+            <button class="nav-toggle" id="navToggle" aria-label="Open/close menu">&#9776;</button>
+            <ul class="nav-links" id="navLinks">
+                <li><a href="https://en.aboutyou.de/your-shop">about me</a></li>
+                <li><a href="https://www.die-linke.de/seitenfuss/kontakt/">contact</a></li>
+		<li><a href="https://maps.app.goo.gl/b6bi6CK8SzqxiRAL6">imprint</a></li>
             </ul>
         </nav>
     </header>
 
-    <main class="flex-grow flex flex-col items-center justify-center p-4 md:p-8">
-        <h2 class="text-2xl md:text-3xl font-bold mb-6 text-center">Willkommen auf t-server.org</h2>
-        <p class="text-lg text-gray-300 mb-10 text-center max-w-2xl">
-            Dies ist der Hauptinhalt Ihrer Website. Sie können hier beliebige Informationen hinzufügen.
-        </p>
-
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 w-full max-w-4xl">
-            <a href="#" class="button bg-gray-800/80 hover:bg-gray-700/80 text-white font-bold py-4 px-6 rounded-lg shadow-md transition-all duration-300 transform hover:scale-105 text-center flex flex-col items-center justify-center">
-                <img src="https://placehold.co/64x64/333/fff?text=NF" alt="Neighbourflix Icon" onerror="this.onerror=null;this.src='https://placehold.co/64x64/333/fff?text=NF';" class="mb-2">
-                <span>Neighbourflix</span>
+    <main>
+        <section class="button-grid-container">
+            <a href="https://www.github.com/aGuyCalledT" class="action-button">
+                <img src="https://placehold.co/60x60/333/FFF?text=git" alt="Github Icon" class="button-icon">
+                <span>Github</span>
             </a>
-            <a href="#" class="button bg-gray-800/80 hover:bg-gray-700/80 text-white font-bold py-4 px-6 rounded-lg shadow-md transition-all duration-300 transform hover:scale-105 text-center flex flex-col items-center justify-center">
-                <img src="https://placehold.co/64x64/333/fff?text=P" alt="Projekte Icon" onerror="this.onerror=null;this.src='https://placehold.0/64x64/333/fff?text=P';" class="mb-2">
-                <span>Projekte</span>
+            <a href="https://www.netflix.com" class="action-button">
+                <img src="https://placehold.co/60x60/333/FFF?text=jf" alt="Jellyfin Icon" class="button-icon">
+                <span>Jellyfin</span>
             </a>
-            <a href="#" class="button bg-gray-800/80 hover:bg-gray-700/80 text-white font-bold py-4 px-6 rounded-lg shadow-md transition-all duration-300 transform hover:scale-105 text-center flex flex-col items-center justify-center">
-                <img src="https://placehold.co/64x64/333/fff?text=FI" alt="Frater Imperator Icon" onerror="this.onerror=null;this.src='https://placehold.0/64x64/333/fff?text=FI';" class="mb-2">
-                <span>Frater Imperator</span>
+            <a href="https://github.com/aGuyCalledT?tab=repositories" class="action-button">
+                <img src="https://placehold.co/60x60/333/FFF?text=pj" alt="Projects Icon" class="button-icon">
+                <span>Projects</span>
             </a>
-            <a href="https://www.github.com/aGuyCalledT" class="button bg-gray-800/80 hover:bg-gray-700/80 text-white font-bold py-4 px-6 rounded-lg shadow-md transition-all duration-300 transform hover:scale-105 text-center flex flex-col items-center justify-center">
-                <img src="https://placehold.co/64x64/333/fff?text=GH" alt="GitHub icon" onerror="this.onerror=null;this.src='https://placehold.0/64x64/333/fff?text=GH';" class="mb-2">
-                <span>GitHub</span>
+            <a href="https://ghost-official.com/" class="action-button">
+                <img src="https://placehold.co/60x60/333/FFF?text=gh" alt="Ghost Icon" class="button-icon">
+                <span>Ghost</span>
             </a>
-        </div>
+            <a href="https://www.youtube.com/watch?v=QunwzgVENUg" class="action-button">
+                <img src="https://placehold.co/60x60/333/FFF?text=msc" alt="Misc Icon" class="button-icon">
+                <span>Misc</span>
+            </a>
+            <!--
+            <a href="#" class="action-button">
+                <img src="https://placehold.co/60x60/333/FFF?text=NEW" alt="New Button Icon" class="button-icon">
+                <span>New Button</span>
+            </a>
+            -->
+        </section>
     </main>
 
-    <footer class="bg-gray-950/80 text-gray-400 text-center p-4 md:p-6 rounded-t-lg shadow-lg mt-8 backdrop-blur-sm">
-        <p>&copy; 2025 t-server.org. Alle Rechte vorbehalten.</p>
+    <footer>
+        <p>&copy; 2025 t-server.org. All rights reserved. | <a href="#privacy">Privacy Policy</a> | <a href="#terms">Terms of Service</a></p>
     </footer>
 
-    <canvas id="mainCanvas"></canvas>
-
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const mainCanvas = document.getElementById('mainCanvas');
-            const ctx = mainCanvas.getContext('2d');
+        document.addEventListener('DOMContentLoaded', () => {
+            const navToggle = document.getElementById('navToggle');
+            const navLinks = document.getElementById('navLinks');
 
-            const buttons = document.querySelectorAll('.button');
-            const mobileMenuButton = document.getElementById('mobile-menu-button');
-            const mainNav = document.getElementById('main-nav');
+            // Function to close the mobile navigation menu
+            const closeMobileMenu = () => {
+                navLinks.classList.remove('active');
+                navToggle.setAttribute('aria-expanded', 'false');
+            };
 
-            let isHovering = false;
-            let mouseX = 0;
-            let mouseY = 0;
-
-            let currentInteractionMultiplier = 1;
-            const smoothingFactor = 0.08;
-
-            const starCount = 300;
-            const stars = [];
-
-            let particleCount = 150;
-            const particles = [];
-
-            const cursorInfluenceRadius = 150;
-            const cursorRepelStrength = 0.08;
-            const hoverRepelMultiplier = 3.0;
-
-            const particleColors = [
-                '#F8F8FF', '#FFF0F5', '#F0F8FF', '#F0FFFF', '#E6E6FA',
-                '#ADD8E6', '#AFEEEE', '#E0FFFF', '#D8BFD8', '#B0E0E6'
-            ];
-            const baseBlurAmount = 5;
-            const baseGlowAmount = 15;
-
-            function resizeCanvas() {
-                mainCanvas.width = window.innerWidth;
-                mainCanvas.height = window.innerHeight;
-                mouseX = mainCanvas.width / 2;
-                mouseY = mainCanvas.height / 2;
-
-                const newParticleCount = window.innerWidth < 768 ? 50 : 150;
-                if (newParticleCount !== particleCount) {
-                    particleCount = newParticleCount;
-                    reinitializeParticles();
+            // Toggle mobile navigation menu
+            navToggle.addEventListener('click', (event) => {
+                event.stopPropagation(); // Prevent document click from closing immediately
+                const isActive = navLinks.classList.contains('active');
+                if (isActive) {
+                    closeMobileMenu();
+                } else {
+                    navLinks.classList.add('active');
+                    navToggle.setAttribute('aria-expanded', 'true');
                 }
+            });
+
+            // Close mobile menu if clicked outside
+            document.addEventListener('click', (event) => {
+                // Check if the click is outside the nav-toggle and nav-links
+                if (!navLinks.contains(event.target) && !navToggle.contains(event.target) && navLinks.classList.contains('active')) {
+                    closeMobileMenu();
+                }
+            });
+
+            // Reset menu state on window resize (desktop <-> mobile)
+            window.addEventListener('resize', () => {
+                if (window.innerWidth > 700) { /* Adjust breakpoint if needed */
+                    // On desktop size: hide mobile menu, reset display
+                    navLinks.classList.remove('active');
+                    navToggle.setAttribute('aria-expanded', 'false');
+                } else {
+                    // On mobile size: ensure menu is hidden by default
+                    navLinks.classList.remove('active');
+                    navToggle.setAttribute('aria-expanded', 'false');
+                }
+            });
+
+            // Particle Animation Logic
+            const canvas = document.getElementById('particleCanvas');
+            const ctx = canvas.getContext('2d');
+
+            let particles = [];
+            const numParticles = 100; // Initial number of particles
+            const maxRadius = 15;
+            const minRadius = 9;
+            const initialMaxSpeed = 0.3; // Initial max speed (reduced for slower movement)
+            const initialMinSpeed = 0.1; // Initial min speed (reduced for slower movement)
+            const rotationSpeedFactor = 0.01; // How quickly particles turn towards target angle
+            const transferAmount = 0.5; // Amount of radius to transfer per collision
+            const minParticleRadius = 1; // Minimum radius a particle can shrink to
+            const shrinkRadiusThreshold = 20; // Radius at which a particle shrinks
+            const newShrunkRadius = 10; // Radius after shrinking
+            const speedIncreaseFactorOnShrink = 4; // Speed multiplier after shrinking (increased for more noticeable speed)
+            const flashDuration = 500; // Duration of the flash effect in milliseconds (increased for smoother fade)
+            const overallBlurAmount = 12; // Overall blur amount for particles
+
+            // Base green value for the particles and the range of variation
+            const baseGreenColor = 139;
+            const greenVariationRange = 30; // Max deviation from baseGreenColor (e.g., -30 to +29)
+
+            let currentMouseX = 0; // To store the current mouse X position on the viewport
+            let currentMouseY = 0; // To store the current mouse Y position on the viewport
+            const maxTotalParticles = 200; // Maximum number of particles allowed on screen
+
+            // Adjust canvas size on load and resize
+            function setCanvasSize() {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
             }
 
-            function reinitializeParticles() {
-                particles.length = 0;
-                for (let i = 0; i < particleCount; i++) {
-                    particles.push(new Particle());
+            // Helper function to parse RGBA color string
+            function parseRGBA(rgbaString) {
+                const match = rgbaString.match(/rgba\((\d+),\s*(\d+),\s*(\d+),\s*([\d.]+)\)/);
+                if (match) {
+                    return {
+                        r: parseInt(match[1]),
+                        g: parseInt(match[2]),
+                        b: parseInt(match[3]),
+                        a: parseFloat(match[4])
+                    };
                 }
+                return { r: 0, g: 0, b: 0, a: 0 }; // Default transparent black
             }
 
-            class Star {
-                constructor() {
-                    this.x = Math.random() * mainCanvas.width;
-                    this.y = Math.random() * mainCanvas.height;
-                    this.size = Math.random() * 1.5 + 0.5;
-                    this.opacity = Math.random() * 0.2 + 0.05;
+            // Helper function for linear interpolation
+            function lerp(a, b, t) {
+                return a + (b - a) * t;
+            }
+
+            // Particle class definition
+            class Particle {
+                constructor(x, y, radius, speed, angle, color) {
+                    this.x = x;
+                    this.y = y;
+                    this.radius = radius;
+                    this.speed = speed; // Magnitude of speed
+                    this.currentAngle = angle; // Current direction in radians
+                    this.targetAngle = angle; // Target direction to curve towards
+                    
+                    // Store base color components and alpha
+                    const baseColorParsed = parseRGBA(color);
+                    this.baseColorR = baseColorParsed.r;
+                    this.baseColorG = baseColorParsed.g;
+                    this.baseColorB = baseColorParsed.b;
+                    this.baseAlpha = baseColorParsed.a;
+
+                    this.nextDirectionChangeTime = Date.now() + Math.random() * 2000 + 1000; // Change every 1-3 seconds
+                    this.isFlashing = false; // New state for flashing effect
+                    this.flashStartTime = 0; // Timestamp when flashing starts
+
+                    // Define flash target values
+                    this.flashTargetAlpha = 0.9; // Target alpha for inner circle during peak flash
+                    this.flashTargetOuterAlpha = 0.3; // Target alpha for outer circle during peak flash
+                    this.flashTargetInnerDotAlpha = 0.5; // Target alpha for inner dot during peak flash
+
+                    // Base blur values
+                    this.baseBlurInner = overallBlurAmount * 0.5;
+                    this.baseBlurOuter = overallBlurAmount * 0.75;
+                    this.baseBlurDot = overallBlurAmount * 0.25;
+
+                    // Flash blur values (less blur)
+                    this.flashBlurInner = overallBlurAmount * 0.125;
+                    this.flashBlurOuter = overallBlurAmount * 0.375;
+                    this.flashBlurDot = overallBlurAmount * 0.0625;
                 }
 
                 draw() {
+                    let t = 0; // Interpolation factor
+                    if (this.isFlashing) {
+                        const flashProgress = (Date.now() - this.flashStartTime) / flashDuration;
+                        // Use sine wave for smooth ease-in/ease-out effect (0 -> 1 -> 0)
+                        t = Math.sin(Math.min(1, flashProgress) * Math.PI); 
+                    }
+
+                    // Interpolate blur values
+                    const currentBlur = `blur(${lerp(this.baseBlurInner, this.flashBlurInner, t)}px)`;
+                    const outerBlur = `blur(${lerp(this.baseBlurOuter, this.flashBlurOuter, t)}px)`;
+                    const innerDotBlur = `blur(${lerp(this.baseBlurDot, this.flashBlurDot, t)}px)`;
+
+                    // Interpolate colors
+                    // For the main particle, interpolate RGB towards white (255, 255, 255) and alpha towards flashTargetAlpha
+                    const interpolatedR = lerp(this.baseColorR, 255, t);
+                    const interpolatedG = lerp(this.baseColorG, 255, t);
+                    const interpolatedB = lerp(this.baseColorB, 255, t);
+                    const interpolatedAlphaInner = lerp(this.baseAlpha, this.flashTargetAlpha, t);
+                    const currentFillStyle = `rgba(${interpolatedR}, ${interpolatedG}, ${interpolatedB}, ${interpolatedAlphaInner})`;
+
+                    // For outer circle, interpolate its alpha
+                    const interpolatedAlphaOuter = lerp(0.05, this.flashTargetOuterAlpha, t);
+                    const outerFillStyle = `rgba(139, 233, 253, ${interpolatedAlphaOuter})`; // Primary color for outer
+
+                    // For inner dot, interpolate its alpha
+                    const interpolatedAlphaDot = lerp(0.8, this.flashTargetInnerDotAlpha, t);
+                    const innerDotFillStyle = `rgba(0, 0, 0, ${interpolatedAlphaDot})`; // Black for inner dot
+
+                    // Draw the larger, semi-transparent circle first
                     ctx.beginPath();
-                    ctx.arc(this.x, this.y, this.size / 2, 0, Math.PI * 2);
-                    ctx.fillStyle = '#FFFFFF';
-                    ctx.globalAlpha = this.opacity;
+                    ctx.arc(this.x, this.y, this.radius * 3, 0, Math.PI * 2, false); 
+                    ctx.fillStyle = outerFillStyle;
+                    ctx.filter = outerBlur;
                     ctx.fill();
-                    ctx.globalAlpha = 1;
-                }
-            }
-
-            class Particle {
-                constructor() {
-                    this.reset();
-                }
-
-                reset() {
-                    this.x = Math.random() * mainCanvas.width;
-                    this.y = Math.random() * mainCanvas.height;
-                    this.size = Math.random() * 30 + 10;
-                    this.initialSpeed = (Math.random() * 0.3) + 0.15;
-                    this.speedX = (Math.random() - 0.5) * 2;
-                    this.speedY = (Math.random() - 0.5) * 2;
-                    this.color = particleColors[Math.floor(Math.random() * particleColors.length)];
                     
-                    this.opacityPhase = Math.random() * Math.PI * 2;
-                    this.opacitySpeed = (Math.random() * 0.005) + 0.002;
-                    this.minOpacity = 0.3;
-                    this.maxOpacity = 0.8;
+                    // Draw the main particle circle
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);
+                    ctx.fillStyle = currentFillStyle;
+                    ctx.filter = currentBlur;
+                    ctx.fill();
 
-                    this.blur = baseBlurAmount + Math.random() * 5;
-                    this.glow = baseGlowAmount + Math.random() * 10;
+                    // Draw the smaller black blurred circle inside
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, this.radius * 0.3, 0, Math.PI * 2, false); 
+                    ctx.fillStyle = innerDotFillStyle;
+                    ctx.filter = innerDotBlur;
+                    ctx.fill();
+
+                    ctx.filter = 'none'; // Reset filter to avoid affecting other elements
                 }
 
-                update() {
-                    let currentSpeed = this.initialSpeed;
-                    const currentRepelStrengthAdjusted = isHovering ? cursorRepelStrength * hoverRepelMultiplier : cursorRepelStrength;
+                update(allParticles) { // Renamed parameter to allParticles for clarity
+                    // Check if it's time to change target direction
+                    if (Date.now() > this.nextDirectionChangeTime) {
+                        this.targetAngle = Math.random() * Math.PI * 2; // New random target angle
+                        this.nextDirectionChangeTime = Date.now() + Math.random() * 2000 + 1000; // Next change in 1-3 seconds
+                    }
 
-                    const dx = this.x - mouseX;
-                    const dy = this.y - mouseY;
-                    const distance = Math.sqrt(dx * dx + dy * dy);
+                    // Smoothly interpolate current angle towards target angle
+                    let angleDiff = this.targetAngle - this.currentAngle;
+                    // Normalize angle difference to be between -PI and PI for shortest turn
+                    if (angleDiff > Math.PI) angleDiff -= Math.PI * 2;
+                    if (angleDiff < -Math.PI) angleDiff += Math.PI * 2;
+                    
+                    this.currentAngle += angleDiff * rotationSpeedFactor;
 
-                    if (distance < cursorInfluenceRadius) {
-                        const angle = Math.atan2(dy, dx);
-                        const repelForce = (cursorInfluenceRadius - distance) / cursorInfluenceRadius * currentRepelStrengthAdjusted;
-                        this.speedX += Math.cos(angle) * repelForce;
-                        this.speedY += Math.sin(angle) * repelForce;
-                        const currentTotalSpeed = Math.sqrt(this.speedX * this.speedX + this.speedY * this.speedY);
-                        if (currentTotalSpeed > currentSpeed * 3) {
-                            this.speedX = (this.speedX / currentTotalSpeed) * currentSpeed * 3;
-                            this.speedY = (this.speedY / currentTotalSpeed) * currentSpeed * 3;
+                    // Keep angle within 0 to 2*PI
+                    this.currentAngle = this.currentAngle % (Math.PI * 2);
+                    if (this.currentAngle < 0) this.currentAngle += Math.PI * 2;
+
+                    // Calculate dx and dy based on current angle and speed
+                    this.dx = Math.cos(this.currentAngle) * this.speed;
+                    this.dy = Math.sin(this.currentAngle) * this.speed;
+
+                    // Bounce off walls
+                    if (this.x + this.radius > canvas.width || this.x - this.radius < 0) {
+                        this.dx = -this.dx;
+                        this.currentAngle = Math.atan2(this.dy, this.dx); // Update angle after bounce
+                    }
+                    if (this.y + this.radius > canvas.height || this.y - this.radius < 0) {
+                        this.dy = -this.dy;
+                        this.currentAngle = Math.atan2(this.dy, this.dx); // Update angle after bounce
+                    }
+
+                    // Move particle
+                    this.x += this.dx;
+                    this.y += this.dy;
+
+                    // Collision detection with other particles (only inner circles affect size)
+                    for (let i = 0; i < allParticles.length; i++) {
+                        const otherParticle = allParticles[i];
+                        if (this === otherParticle) continue; // Don't check collision with self
+
+                        const distance = Math.sqrt(
+                            (this.x - otherParticle.x) ** 2 + (this.y - otherParticle.y) ** 2
+                        );
+
+                        if (distance - (this.radius + otherParticle.radius) < 0) {
+                            // Simple bounce: reverse velocities (and update angles)
+                            const tempDx = this.dx;
+                            const tempDy = this.dy;
+
+                            this.dx = otherParticle.dx;
+                            this.dy = otherParticle.dy;
+                            otherParticle.dx = tempDx;
+                            otherParticle.dy = tempDy;
+
+                            // Update angles after collision
+                            this.currentAngle = Math.atan2(this.dy, this.dx);
+                            otherParticle.currentAngle = Math.atan2(otherParticle.dy, otherParticle.dx);
+
+                            // To prevent particles from sticking, slightly move them apart
+                            const overlap = (this.radius + otherParticle.radius) - distance;
+                            const angle = Math.atan2(this.y - otherParticle.y, this.x - otherParticle.x);
+                            this.x += Math.cos(angle) * overlap / 2;
+                            this.y += Math.sin(angle) * overlap / 2;
+                            otherParticle.x -= Math.cos(angle) * overlap / 2;
+                            otherParticle.y -= Math.sin(angle) * overlap / 2;
+
+                            // LOGIC FOR SIZE TRANSFER: smaller shrinks, larger grows
+                            if (this.radius < otherParticle.radius) {
+                                // 'this' is smaller, 'otherParticle' is larger
+                                const actualTransfer = Math.min(transferAmount, this.radius - minParticleRadius);
+                                if (actualTransfer > 0) {
+                                    this.radius -= actualTransfer;
+                                    otherParticle.radius += actualTransfer;
+                                }
+                            } else if (otherParticle.radius < this.radius) {
+                                // 'otherParticle' is smaller, 'this' is larger
+                                const actualTransfer = Math.min(transferAmount, otherParticle.radius - minParticleRadius);
+                                if (actualTransfer > 0) {
+                                    otherParticle.radius -= actualTransfer;
+                                    this.radius += actualTransfer;
+                                }
+                            }
+                            // If radii are equal, no size change.
                         }
                     }
 
-                    this.x += this.speedX * currentSpeed;
-                    this.y += this.speedY * currentSpeed;
+                    // NEW LOGIC: Shrink, speed up, and flash if radius reaches 20
+                    if (this.radius >= shrinkRadiusThreshold) {
+                        this.radius = newShrunkRadius;
+                        // Only increase speed if it's not already flashing from this event
+                        if (!this.isFlashing) { 
+                            this.speed *= speedIncreaseFactorOnShrink;
+                        }
+                        // Optionally, reset targetAngle to give it a new direction after shrinking
+                        this.targetAngle = Math.random() * Math.PI * 2;
+                        this.nextDirectionChangeTime = Date.now() + Math.random() * 2000 + 1000; // Reset direction change timer
+                        
+                        // Activate flash effect
+                        this.isFlashing = true;
+                        this.flashStartTime = Date.now(); // Set flash start time
+                    }
 
-                    this.opacityPhase += this.opacitySpeed;
-                    this.opacity = ((Math.sin(this.opacityPhase) + 1) / 2) * (this.maxOpacity - this.minOpacity) + this.minOpacity;
+                    // Deactivate flash if duration has passed
+                    if (this.isFlashing && (Date.now() - this.flashStartTime) > flashDuration) {
+                        this.isFlashing = false;
+                    }
 
-                    if (this.x < -this.size) this.x = mainCanvas.width + this.size;
-                    if (this.x > mainCanvas.width + this.size) this.x = -this.size;
-                    if (this.y < -this.size) this.y = mainCanvas.height + this.size;
-                    if (this.y > mainCanvas.height + this.size) this.y = -this.size;
-                }
-
-                draw() {
-                    ctx.beginPath();
-                    ctx.arc(this.x, this.y, this.size / 2 + 5, 0, Math.PI * 2);
-                    ctx.fillStyle = this.color;
-                    ctx.globalAlpha = this.opacity * 0.4;
-                    ctx.shadowBlur = this.glow * 1.5;
-                    ctx.shadowColor = this.color;
-                    ctx.filter = `blur(${this.blur * 1.5}px)`;
-                    ctx.fill();
-
-                    ctx.beginPath();
-                    ctx.arc(this.x, this.y, this.size / 2, 0, Math.PI * 2);
-                    ctx.fillStyle = this.color;
-                    ctx.globalAlpha = this.opacity;
-                    ctx.shadowBlur = this.glow;
-                    ctx.shadowColor = this.color;
-                    ctx.filter = `blur(${this.blur}px)`;
-                    ctx.fill();
-
-                    ctx.globalAlpha = 1;
-                    ctx.shadowBlur = 0;
-                    ctx.shadowColor = 'rgba(0,0,0,0)';
-                    ctx.filter = 'none';
+                    this.draw();
                 }
             }
 
-            class TitleParticle extends Particle {
-                constructor(initialX, initialY) {
-                    super();
-                    this.x = initialX;
-                    this.y = initialY;
-                    this.size = 40;
-                    this.initialSpeed = 0.05;
-                    this.speedX = (Math.random() - 0.5) * 0.5;
-                    this.speedY = (Math.random() - 0.5) * 0.5;
-                    this.color = '#E6E6FA';
-                    this.opacityPhase = Math.random() * Math.PI * 2;
-                    this.opacitySpeed = 0.005;
-                    this.minOpacity = 0.6;
-                    this.maxOpacity = 0.9;
-                    this.blur = 0.1;
-                    this.glow = 10;
-                }
-
-                update() {
-                    this.x += this.speedX * this.initialSpeed;
-                    this.y += this.speedY * this.initialSpeed;
-
-                    const maxOffset = 5;
-                    const headerH1 = document.querySelector('header h1');
-                    const textSpan = headerH1.querySelector('span:last-child');
-                    if (!textSpan) {
-                        this.x = mainCanvas.width / 2 - 30;
-                        this.y = 40;
-                        return;
-                    }
-
-                    const h1Rect = headerH1.getBoundingClientRect();
-                    const textRect = textSpan.getBoundingClientRect();
+            // Initialize particles
+            function initParticles() {
+                particles = []; // Clear existing particles
+                for (let i = 0; i < numParticles; i++) {
+                    const radius = Math.random() * (maxRadius - minRadius) + minRadius;
+                    let x = Math.random() * (canvas.width - radius * 2) + radius;
+                    let y = Math.random() * (canvas.height - radius * 2) + radius;
+                    const speed = Math.random() * (initialMaxSpeed - initialMinSpeed) + initialMinSpeed;
+                    const angle = Math.random() * Math.PI * 2; // Initial random angle
                     
-                    const targetX = textRect.left - this.size / 2 - 8;
-                    const targetY = textRect.top + textRect.height / 2;
+                    // Generate a random green component within the defined range
+                    const greenDeviation = Math.floor(Math.random() * (2 * greenVariationRange)) - greenVariationRange; // -greenVariationRange to +greenVariationRange-1
+                    const greenComponent = Math.max(0, Math.min(255, baseGreenColor + greenDeviation)); // Ensure it stays within 0-255
 
-                    const dx = this.x - targetX;
-                    const dy = this.y - targetY;
-                    const distance = Math.sqrt(dx * dx + dy * dy);
+                    // Base color for particles (blueish-cyan with random green)
+                    const color = `rgba(139, ${greenComponent}, 253, ${Math.random() * 0.4 + 0.1})`; 
 
-                    if (distance > maxOffset) {
-                        const angle = Math.atan2(dy, dx);
-                        this.x -= Math.cos(angle) * (distance - maxOffset) * 0.05;
-                        this.y -= Math.sin(angle) * (distance - maxOffset) * 0.05;
+                    // Ensure particles don't overlap when initialized
+                    for (let j = 0; j < particles.length; j++) {
+                        const otherParticle = particles[j];
+                        const distance = Math.sqrt(
+                            (x - otherParticle.x) ** 2 + (y - otherParticle.y) ** 2
+                        );
+                        if (distance - (radius + otherParticle.radius) < 0) {
+                            // If overlap, re-initialize position
+                            x = Math.random() * (canvas.width - radius * 2) + radius;
+                            y = Math.random() * (canvas.height - radius * 2) + radius;
+                            j = -1; // Restart check for current particle
+                        }
                     }
 
-                    this.opacityPhase += this.opacitySpeed;
-                    this.opacity = ((Math.sin(this.opacityPhase) + 1) / 2) * (this.maxOpacity - this.minOpacity) + this.minOpacity;
+                    particles.push(new Particle(x, y, radius, speed, angle, color));
                 }
             }
 
-            class ButtonParticle extends Particle {
-                constructor(buttonElement) {
-                    super();
-                    this.buttonElement = buttonElement;
-                    this.size = Math.random() * 10 + 20;
-                    this.initialSpeed = (Math.random() * 0.1) + 0.2;
-                    this.speedX = (Math.random() - 0.5) * 0.5;
-                    this.speedY = (Math.random() - 0.5) * 0.5;
-                    this.color = particleColors[Math.floor(Math.random() * particleColors.length)];
-                    this.opacityPhase = Math.random() * Math.PI * 2;
-                    this.opacitySpeed = (Math.random() * 0.005) + 0.002;
-                    this.minOpacity = 0.6;
-                    this.maxOpacity = 0.9;
-                    this.blur = 0.1;
-                    this.glow = 15;
-                }
-
-                update() {
-                    const rect = this.buttonElement.getBoundingClientRect();
-                    const targetX = rect.left + rect.width / 2;
-                    const targetY = rect.bottom + this.size / 2 + 10;
-
-                    const dx = this.x - targetX;
-                    const dy = this.y - targetY;
-                    const distance = Math.sqrt(dx * dx + dy * dy);
-
-                    const pullStrength = 0.03;
-                    this.x -= dx * pullStrength;
-                    this.y -= dy * pullStrength;
-
-                    this.x += this.speedX * this.initialSpeed;
-                    this.y += this.speedY * this.initialSpeed;
-
-                    this.opacityPhase += this.opacitySpeed;
-                    this.opacity = ((Math.sin(this.opacityPhase) + 1) / 2) * (this.maxOpacity - this.minOpacity) + this.minOpacity;
-                }
-            }
-
-            resizeCanvas();
-
-            for (let i = 0; i < starCount; i++) {
-                stars.push(new Star());
-            }
-
-            reinitializeParticles();
-
-            const titleParticleInstance = new TitleParticle(0, 0);
-
-            const buttonParticles = [];
-            buttons.forEach(button => {
-                buttonParticles.push(new ButtonParticle(button));
-            });
-
+            // Animation loop
             function animate() {
-                ctx.clearRect(0, 0, mainCanvas.width, mainCanvas.height);
-
-                stars.forEach(star => {
-                    star.draw();
-                });
-
-                particles.forEach(particle => {
-                    particle.update();
-                    particle.draw();
-                });
-
-                buttonParticles.forEach(bParticle => {
-                    bParticle.update();
-                    bParticle.draw();
-                });
-
-                titleParticleInstance.update();
-                titleParticleInstance.draw();
-
                 requestAnimationFrame(animate);
+                ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear canvas
+
+                for (let i = 0; i < particles.length; i++) {
+                    particles[i].update(particles);
+                }
             }
 
+            // Event listeners
             window.addEventListener('resize', () => {
-                resizeCanvas();
-                const headerH1 = document.querySelector('header h1');
-                const textSpan = headerH1.querySelector('span:last-child');
-                if (textSpan) {
-                    const h1Rect = headerH1.getBoundingClientRect();
-                    const textRect = textSpan.getBoundingClientRect();
+                setCanvasSize();
+                initParticles(); // Re-initialize particles on resize to distribute them correctly
+            });
+
+            // Update currentMouseX and currentMouseY globally on mouse move
+            document.addEventListener('mousemove', (event) => {
+                currentMouseX = event.clientX;
+                currentMouseY = event.clientY;
+            });
+
+            // Add new particle on left mouse button press (event.button === 0)
+            canvas.addEventListener('mousedown', (event) => {
+                // Check if the left mouse button was pressed (event.button === 0)
+                if (event.button === 0) {
+                    const rect = canvas.getBoundingClientRect();
+                    // Calculate spawn position relative to the canvas
+                    const spawnX = event.clientX - rect.left;
+                    const spawnY = event.clientY - rect.top;
+
+                    // Create a new particle at the current mouse location
+                    const radius = Math.random() * (maxRadius - minRadius) + minRadius;
+                    const speed = Math.random() * (initialMaxSpeed - initialMinSpeed) + initialMinSpeed;
+                    const angle = Math.random() * Math.PI * 2;
                     
-                    const targetX = textRect.left - titleParticleInstance.size / 2 - 8;
-                    const targetY = textRect.top + textRect.height / 2;
+                    // Generate a random green component for new particles
+                    const greenDeviation = Math.floor(Math.random() * (2 * greenVariationRange)) - greenVariationRange;
+                    const greenComponent = Math.max(0, Math.min(255, baseGreenColor + greenDeviation));
+                    const color = `rgba(139, ${greenComponent}, 253, ${Math.random() * 0.4 + 0.1})`;
 
-                    titleParticleInstance.x = targetX;
-                    titleParticleInstance.y = targetY;
+                    // Only add if not exceeding a reasonable maximum particle count
+                    if (particles.length < maxTotalParticles) {
+                        particles.push(new Particle(spawnX, spawnY, radius, speed, angle, color));
+                    }
                 }
-                buttons.forEach((button, index) => {
-                    buttonParticles[index].update();
-                });
             });
 
-            mainCanvas.addEventListener('mousemove', function(e) {
-                mouseX = e.clientX;
-                mouseY = e.clientY;
-            });
-
-            buttons.forEach(button => {
-                button.addEventListener('mouseover', function() {
-                    isHovering = true;
-                });
-                button.addEventListener('mouseout', function() {
-                    isHovering = false;
-                });
-            });
-
-            // Toggle mobile navigation
-            mobileMenuButton.addEventListener('click', () => {
-                mainNav.classList.toggle('hidden');
-                mainNav.classList.toggle('flex');
-            });
-
+            // Initial setup
+            setCanvasSize();
+            initParticles();
             animate();
         });
     </script>
-
 </body>
 </html>
 
