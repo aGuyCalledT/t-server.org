@@ -10,7 +10,6 @@
         body {
             font-family: 'Inter', sans-serif;
             background-color: #000000; /* Standard schwarzer Hintergrund */
-            /* overflow: hidden wurde entfernt, um Scrollen zu ermöglichen */
             cursor: default; /* Standard-Cursor, um die Interaktion zu betonen */
         }
 
@@ -21,7 +20,8 @@
             left: 0;
             width: 100vw;
             height: 100vh;
-            z-index: -1; /* Sorgt dafür, dass die Canvas hinter allen HTML-Elementen liegt */
+            z-index: 10; /* Sorgt dafür, dass die Canvas VOR den HTML-Elementen liegt */
+            pointer-events: none; /* Ermöglicht Klicks auf Elemente darunter */
         }
 
         /* Zusätzliche Stile für Bilder innerhalb der Schaltflächen */
@@ -45,16 +45,66 @@
             100% { transform: translateY(0px); }
         }
 
-        .button {
-            animation: button-float 4s ease-in-out infinite; /* Langsame, sanfte Bewegung */
+        /* Farbanimation für Buttons */
+        @keyframes button-color-change {
+            0% { background-color: #F8F8FF; }
+            10% { background-color: #FFF0F5; }
+            20% { background-color: #F0F8FF; }
+            30% { background-color: #F0FFFF; }
+            40% { background-color: #E6E6FA; }
+            50% { background-color: #ADD8E6; }
+            60% { background-color: #AFEEEE; }
+            70% { background-color: #E0FFFF; }
+            80% { background-color: #D8BFD8; }
+            90% { background-color: #B0E0E6; }
+            100% { background-color: #F8F8FF; }
         }
 
-        /* Versetzte Animation für Schaltflächen (Wellen-Effekt) */
-        .button:nth-child(1) { animation-delay: 0s; }
-        .button:nth-child(2) { animation-delay: 0.2s; }
-        .button:nth-child(3) { animation-delay: 0.4s; }
-        .button:nth-child(4) { animation-delay: 0.6s; }
+        /* Mobile-first: Standardstile für Buttons (quadratisch, zentriert, kein Padding, keine Animation) */
+        .button {
+            width: 8rem; /* 128px */
+            height: 8rem; /* 128px */
+            padding: 0; /* Entfernt Padding, da Größe fixiert ist */
+            margin-left: auto; /* Zentriert horizontal */
+            margin-right: auto; /* Zentriert horizontal */
+            animation: none !important; /* Deaktiviert alle Animationen auf Mobilgeräten */
+            background-color: rgba(75, 85, 99, 0.8); /* Standardfarbe für Mobilgeräte (gray-800/80) */
+            transition: background-color 0.3s ease-in-out; /* Sanfter Hover-Übergang */
+        }
 
+        .button:hover {
+            background-color: rgba(75, 85, 99, 0.8); /* Entspricht Tailwind gray-700/80 */
+        }
+
+        /* Erhöht den vertikalen Abstand für das Grid auf Mobilgeräten */
+        .grid {
+            gap: 2rem !important; /* Überschreibt Tailwind's gap-6 mit gap-8 (32px) */
+        }
+
+        /* Desktop-Stile: Überschreiben der mobilen Stile ab 640px (sm breakpoint) */
+        @media (min-width: 640px) {
+            .button {
+                width: auto; /* Zurück zu automatischer Breite */
+                height: auto; /* Zurück zu automatischer Höhe */
+                padding-top: 1rem; /* py-4 */
+                padding-bottom: 1rem; /* py-4 */
+                padding-left: 1.5rem; /* px-6 */
+                padding-right: 1.5rem; /* px-6 */
+                margin-left: unset; /* Entfernt auto margins */
+                margin-right: unset; /* Entfernt auto margins */
+                animation: button-float 4s ease-in-out infinite, button-color-change 20s linear infinite; /* Animationen aktivieren */
+            }
+            /* Versetzte Startzeiten für die Farbanimation */
+            .button:nth-child(1) { animation-delay: 0s, 0s; } /* float-delay, color-delay */
+            .button:nth-child(2) { animation-delay: 0.2s, -5s; }
+            .button:nth-child(3) { animation-delay: 0.4s, -10s; }
+            .button:nth-child(4) { animation-delay: 0.6s, -15s; }
+
+            /* Setzt den Grid-Abstand für Desktop zurück auf den Standard (gap-6) */
+            .grid {
+                gap: 1.5rem !important; /* Default gap-6 is 1.5rem */
+            }
+        }
 
         /* Stil für den Partikel im Titel (noch weniger verschwommen) */
         .title-particle {
@@ -82,16 +132,23 @@
 </head>
 <body class="text-white min-h-screen flex flex-col">
 
-    <header class="bg-gray-950/80 text-white p-4 md:p-6 flex flex-col md:flex-row justify-between items-center rounded-b-lg shadow-lg backdrop-blur-sm">
+    <header class="bg-gray-950/80 text-white p-4 md:p-6 flex flex-col md:flex-row justify-between items-center rounded-b-lg shadow-lg backdrop-blur-sm relative">
         <h1 class="text-3xl md:text-4xl font-bold text-indigo-400 mb-4 md:mb-0 flex items-center tracking-wider">
             <span class="title-particle"></span>
             t-server.org
         </h1>
-        <nav>
+        
+        <button id="mobile-menu-button" class="md:hidden text-white focus:outline-none absolute top-4 right-4 z-20">
+            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+            </svg>
+        </button>
+
+        <nav id="main-nav" class="hidden md:flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-8 mt-4 md:mt-0 w-full md:w-auto absolute md:relative top-full left-0 bg-gray-950/90 md:bg-transparent p-4 md:p-0 rounded-b-lg shadow-lg md:shadow-none">
             <ul class="flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-8">
-                <li><a href="#impressum" class="text-white hover:text-indigo-400 font-semibold transition-colors duration-300">Impressum</a></li>
-                <li><a href="#kontakt" class="text-white hover:text-indigo-400 font-semibold transition-colors duration-300">Kontakt</a></li>
-                <li><a href="#ueber-mich" class="text-white hover:text-indigo-400 font-semibold transition-colors duration-300">Über mich</a></li>
+                <li><a href="#impressum" class="text-white hover:text-indigo-400 font-semibold transition-colors duration-300 block py-2 px-4 md:py-0 md:px-0 rounded-md md:rounded-none">Impressum</a></li>
+                <li><a href="#kontakt" class="text-white hover:text-indigo-400 font-semibold transition-colors duration-300 block py-2 px-4 md:py-0 md:px-0 rounded-md md:rounded-none">Kontakt</a></li>
+                <li><a href="#ueber-mich" class="text-white hover:text-indigo-400 font-semibold transition-colors duration-300 block py-2 px-4 md:py-0 md:px-0 rounded-md md:rounded-none">Über mich</a></li>
             </ul>
         </nav>
     </header>
@@ -116,7 +173,7 @@
                 <span>Frater Imperator</span>
             </a>
             <a href="https://www.github.com/aGuyCalledT" class="button bg-gray-800/80 hover:bg-gray-700/80 text-white font-bold py-4 px-6 rounded-lg shadow-md transition-all duration-300 transform hover:scale-105 text-center flex flex-col items-center justify-center">
-                <img src="https://placehold.co/64x64/333/fff?text=GH" alt="GitHub icon" onerror="this.onerror=null;this.src='https://placehold.0/64x64/333/fff?text=ETR';" class="mb-2">
+                <img src="https://placehold.co/64x64/333/fff?text=GH" alt="GitHub icon" onerror="this.onerror=null;this.src='https://placehold.0/64x64/333/fff?text=GH';" class="mb-2">
                 <span>GitHub</span>
             </a>
         </div>
@@ -129,12 +186,13 @@
     <canvas id="mainCanvas"></canvas>
 
     <script>
-        // Wait until the entire HTML document is loaded
         document.addEventListener('DOMContentLoaded', function() {
             const mainCanvas = document.getElementById('mainCanvas');
             const ctx = mainCanvas.getContext('2d');
 
             const buttons = document.querySelectorAll('.button');
+            const mobileMenuButton = document.getElementById('mobile-menu-button');
+            const mainNav = document.getElementById('main-nav');
 
             let isHovering = false;
             let mouseX = 0;
@@ -146,52 +204,40 @@
             const starCount = 300;
             const stars = [];
 
-            let particleCount = 150; // Initial value, will be adjusted
-            const particles = []; // General background particles
+            let particleCount = 150;
+            const particles = [];
 
             const cursorInfluenceRadius = 150;
             const cursorRepelStrength = 0.08;
             const hoverRepelMultiplier = 3.0;
 
             const particleColors = [
-                '#F8F8FF', // GhostWhite (pure white-ish)
-                '#FFF0F5', // LavenderBlush (very light pink)
-                '#F0F8FF', // AliceBlue (very light blue)
-                '#F0FFFF', // Azure (very light cyan/turquoise)
-                '#E6E6FA', // Lavender (light purple)
-                '#ADD8E6', // LightBlue (light blue)
-                '#AFEEEE', // PaleTurquoise (light turquoise)
-                '#E0FFFF', // LightCyan (very light blue/cyan)
-                '#D8BFD8', // Thistle (light purple)
-                '#B0E0E6'  // PowderBlue (light blue)
+                '#F8F8FF', '#FFF0F5', '#F0F8FF', '#F0FFFF', '#E6E6FA',
+                '#ADD8E6', '#AFEEEE', '#E0FFFF', '#D8BFD8', '#B0E0E6'
             ];
             const baseBlurAmount = 5;
             const baseGlowAmount = 15;
 
-            // Function to resize the canvas and adjust particle count
             function resizeCanvas() {
                 mainCanvas.width = window.innerWidth;
                 mainCanvas.height = window.innerHeight;
                 mouseX = mainCanvas.width / 2;
                 mouseY = mainCanvas.height / 2;
 
-                // Adjust particle count based on screen width
-                const newParticleCount = window.innerWidth < 768 ? 50 : 150; // Fewer particles on smaller screens
+                const newParticleCount = window.innerWidth < 768 ? 50 : 150;
                 if (newParticleCount !== particleCount) {
                     particleCount = newParticleCount;
-                    reinitializeParticles(); // Reinitialize background particles
+                    reinitializeParticles();
                 }
             }
 
-            // Function to reinitialize background particles
             function reinitializeParticles() {
-                particles.length = 0; // Clear existing particles
+                particles.length = 0;
                 for (let i = 0; i < particleCount; i++) {
                     particles.push(new Particle());
                 }
             }
 
-            // Star class (for static background dots)
             class Star {
                 constructor() {
                     this.x = Math.random() * mainCanvas.width;
@@ -210,7 +256,6 @@
                 }
             }
 
-            // Base Particle class (moving lights)
             class Particle {
                 constructor() {
                     this.reset();
@@ -292,7 +337,6 @@
                 }
             }
 
-            // Title Particle Class (fixed position, no eyes)
             class TitleParticle extends Particle {
                 constructor(initialX, initialY) {
                     super();
@@ -345,21 +389,20 @@
                 }
             }
 
-            // Class for particles under buttons (no eyes)
             class ButtonParticle extends Particle {
                 constructor(buttonElement) {
                     super();
                     this.buttonElement = buttonElement;
-                    this.size = Math.random() * 10 + 20; // Varied size: between 20 and 30
-                    this.initialSpeed = (Math.random() * 0.1) + 0.2; // Faster movement: between 0.2 and 0.3
+                    this.size = Math.random() * 10 + 20;
+                    this.initialSpeed = (Math.random() * 0.1) + 0.2;
                     this.speedX = (Math.random() - 0.5) * 0.5;
                     this.speedY = (Math.random() - 0.5) * 0.5;
-                    this.color = particleColors[Math.floor(Math.random() * particleColors.length)]; // Varied colors
+                    this.color = particleColors[Math.floor(Math.random() * particleColors.length)];
                     this.opacityPhase = Math.random() * Math.PI * 2;
                     this.opacitySpeed = (Math.random() * 0.005) + 0.002;
                     this.minOpacity = 0.6;
                     this.maxOpacity = 0.9;
-                    this.blur = 0.1; // Sharper outline
+                    this.blur = 0.1;
                     this.glow = 15;
                 }
 
@@ -384,32 +427,24 @@
                 }
             }
 
-            // Initialization and start of animation
-            resizeCanvas(); // Initial canvas size and particle count setup
+            resizeCanvas();
 
-            // Initialize stars
             for (let i = 0; i < starCount; i++) {
                 stars.push(new Star());
             }
 
-            // Initialize general background particles based on initial particleCount
             reinitializeParticles();
 
-            // Initialize title particle
             const titleParticleInstance = new TitleParticle(0, 0);
 
-            // Initialize button particles
             const buttonParticles = [];
             buttons.forEach(button => {
                 buttonParticles.push(new ButtonParticle(button));
             });
 
-
-            // Animation loop
             function animate() {
-                ctx.clearRect(0, 0, mainCanvas.width, mainCanvas.height); // Clear the single canvas
+                ctx.clearRect(0, 0, mainCanvas.width, mainCanvas.height);
 
-                // Drawing order ensures correct layering
                 stars.forEach(star => {
                     star.draw();
                 });
@@ -419,24 +454,19 @@
                     particle.draw();
                 });
 
-                // Draw button particles (appear above HTML elements due to drawing order on single canvas)
                 buttonParticles.forEach(bParticle => {
                     bParticle.update();
                     bParticle.draw();
                 });
 
-                // Draw the title particle last (appears above HTML elements and other particles)
                 titleParticleInstance.update();
                 titleParticleInstance.draw();
-
 
                 requestAnimationFrame(animate);
             }
 
-            // Event listener for window resize
             window.addEventListener('resize', () => {
-                resizeCanvas(); // This will also reinitialize background particles if count changes
-                // Re-initialize title particle position on resize
+                resizeCanvas();
                 const headerH1 = document.querySelector('header h1');
                 const textSpan = headerH1.querySelector('span:last-child');
                 if (textSpan) {
@@ -449,20 +479,16 @@
                     titleParticleInstance.x = targetX;
                     titleParticleInstance.y = targetY;
                 }
-                // Re-initialize button particles positions on resize
                 buttons.forEach((button, index) => {
                     buttonParticles[index].update();
                 });
             });
 
-
-            // Event listener for mouse movement to track cursor position
             mainCanvas.addEventListener('mousemove', function(e) {
                 mouseX = e.clientX;
                 mouseY = e.clientY;
             });
 
-            // Event listener for button hover
             buttons.forEach(button => {
                 button.addEventListener('mouseover', function() {
                     isHovering = true;
@@ -472,9 +498,16 @@
                 });
             });
 
+            // Toggle mobile navigation
+            mobileMenuButton.addEventListener('click', () => {
+                mainNav.classList.toggle('hidden');
+                mainNav.classList.toggle('flex');
+            });
+
             animate();
         });
     </script>
 
 </body>
 </html>
+
