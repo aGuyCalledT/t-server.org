@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>t-server.org</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Grundlegende Stile für die Schriftart */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #000000; /* Standard schwarzer Hintergrund */
+            /* overflow: hidden wurde entfernt, um Scrollen zu ermöglichen */
+            cursor: default; /* Standard-Cursor, um die Interaktion zu betonen */
+        }
+
+        /* Canvas-Stile für den einzigen Canvas-Layer */
+        #mainCanvas {
+            position: fixed; /* Fixiert die Canvas im Hintergrund */
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: -1; /* Sorgt dafür, dass die Canvas hinter allen HTML-Elementen liegt */
+        }
+
+        /* Zusätzliche Stile für Bilder innerhalb der Schaltflächen */
+        .button img {
+            display: block;
+            margin: 0 auto 8px auto; /* Zentriert das Bild und fügt Abstand nach unten hinzu */
+            max-width: 64px; /* Maximale Breite des Bildes */
+            height: auto; /* Höhe automatisch anpassen */
+            border-radius: 4px; /* Leichte Abrundung für die Bilder */
+        }
+
+        /* Textschatten für den Haupttext */
+        main h2, main p {
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7); /* Subtiler schwarzer Schatten */
+        }
+
+        /* Animation für Buttons im Ruhezustand */
+        @keyframes button-float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-5px); }
+            100% { transform: translateY(0px); }
+        }
+
+        .button {
+            animation: button-float 4s ease-in-out infinite; /* Langsame, sanfte Bewegung */
+        }
+
+        /* Versetzte Animation für Schaltflächen (Wellen-Effekt) */
+        .button:nth-child(1) { animation-delay: 0s; }
+        .button:nth-child(2) { animation-delay: 0.2s; }
+        .button:nth-child(3) { animation-delay: 0.4s; }
+        .button:nth-child(4) { animation-delay: 0.6s; }
+
+
+        /* Stil für den Partikel im Titel (noch weniger verschwommen) */
+        .title-particle {
+            display: inline-block; /* Damit es neben dem Text bleibt */
+            width: 30px; /* Größe des Partikels */
+            height: 30px;
+            border-radius: 50%; /* Rund */
+            background-color: #E6E6FA; /* Eine der Pastellfarben (Lavender) */
+            filter: blur(0.01px); /* Fast keine Unschärfe für den Vordergrund-Eindruck */
+            box-shadow: 0 0 10px 3px #E6E6FA; /* Leuchten, etwas weniger stark als zuvor */
+            position: relative; /* Für die Animation */
+            top: 2px; /* Leichte vertikale Ausrichtung */
+            margin-right: 8px; /* Abstand zum Text */
+            animation: title-particle-float 3s ease-in-out infinite alternate; /* Sanfte Bewegung */
+        }
+
+        @keyframes title-particle-float {
+            0% { transform: translateY(0px) translateX(0px); }
+            25% { transform: translateY(-3px) translateX(3px); } /* Angepasste Bewegung für größere Größe */
+            50% { transform: translateY(0px) translateX(0px); }
+            75% { transform: translateY(3px) translateX(-3px); } /* Angepasste Bewegung für größere Größe */
+            100% { transform: translateY(0px) translateX(0px); }
+        }
+    </style>
+</head>
+<body class="text-white min-h-screen flex flex-col">
+
+    <header class="bg-gray-950/80 text-white p-4 md:p-6 flex flex-col md:flex-row justify-between items-center rounded-b-lg shadow-lg backdrop-blur-sm">
+        <h1 class="text-3xl md:text-4xl font-bold text-indigo-400 mb-4 md:mb-0 flex items-center tracking-wider">
+            <span class="title-particle"></span>
+            t-server.org
+        </h1>
+        <nav>
+            <ul class="flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-8">
+                <li><a href="#impressum" class="text-white hover:text-indigo-400 font-semibold transition-colors duration-300">Impressum</a></li>
+                <li><a href="#kontakt" class="text-white hover:text-indigo-400 font-semibold transition-colors duration-300">Kontakt</a></li>
+                <li><a href="#ueber-mich" class="text-white hover:text-indigo-400 font-semibold transition-colors duration-300">Über mich</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main class="flex-grow flex flex-col items-center justify-center p-4 md:p-8">
+        <h2 class="text-2xl md:text-3xl font-bold mb-6 text-center">Willkommen auf t-server.org</h2>
+        <p class="text-lg text-gray-300 mb-10 text-center max-w-2xl">
+            Dies ist der Hauptinhalt Ihrer Website. Sie können hier beliebige Informationen hinzufügen.
+        </p>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 w-full max-w-4xl">
+            <a href="#" class="button bg-gray-800/80 hover:bg-gray-700/80 text-white font-bold py-4 px-6 rounded-lg shadow-md transition-all duration-300 transform hover:scale-105 text-center flex flex-col items-center justify-center">
+                <img src="https://placehold.co/64x64/333/fff?text=NF" alt="Neighbourflix Icon" onerror="this.onerror=null;this.src='https://placehold.co/64x64/333/fff?text=NF';" class="mb-2">
+                <span>Neighbourflix</span>
+            </a>
+            <a href="#" class="button bg-gray-800/80 hover:bg-gray-700/80 text-white font-bold py-4 px-6 rounded-lg shadow-md transition-all duration-300 transform hover:scale-105 text-center flex flex-col items-center justify-center">
+                <img src="https://placehold.co/64x64/333/fff?text=P" alt="Projekte Icon" onerror="this.onerror=null;this.src='https://placehold.0/64x64/333/fff?text=P';" class="mb-2">
+                <span>Projekte</span>
+            </a>
+            <a href="#" class="button bg-gray-800/80 hover:bg-gray-700/80 text-white font-bold py-4 px-6 rounded-lg shadow-md transition-all duration-300 transform hover:scale-105 text-center flex flex-col items-center justify-center">
+                <img src="https://placehold.co/64x64/333/fff?text=FI" alt="Frater Imperator Icon" onerror="this.onerror=null;this.src='https://placehold.0/64x64/333/fff?text=FI';" class="mb-2">
+                <span>Frater Imperator</span>
+            </a>
+            <a href="#" class="button bg-gray-800/80 hover:bg-gray-700/80 text-white font-bold py-4 px-6 rounded-lg shadow-md transition-all duration-300 transform hover:scale-105 text-center flex flex-col items-center justify-center">
+                <img src="https://placehold.co/64x64/333/fff?text=ETR" alt="Eat the Rich Icon" onerror="this.onerror=null;this.src='https://placehold.0/64x64/333/fff?text=ETR';" class="mb-2">
+                <span>Eat the Rich</span>
+            </a>
+        </div>
+    </main>
+
+    <footer class="bg-gray-950/80 text-gray-400 text-center p-4 md:p-6 rounded-t-lg shadow-lg mt-8 backdrop-blur-sm">
+        <p>&copy; 2025 t-server.org. Alle Rechte vorbehalten.</p>
+    </footer>
+
+    <canvas id="mainCanvas"></canvas>
+
+    <script>
+        // Wait until the entire HTML document is loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            const mainCanvas = document.getElementById('mainCanvas');
+            const ctx = mainCanvas.getContext('2d');
+
+            const buttons = document.querySelectorAll('.button');
+
+            let isHovering = false;
+            let mouseX = 0;
+            let mouseY = 0;
+
+            let currentInteractionMultiplier = 1;
+            const smoothingFactor = 0.08;
+
+            const starCount = 300;
+            const stars = [];
+
+            let particleCount = 150; // Initial value, will be adjusted
+            const particles = []; // General background particles
+
+            const cursorInfluenceRadius = 150;
+            const cursorRepelStrength = 0.08;
+            const hoverRepelMultiplier = 3.0;
+
+            const particleColors = [
+                '#F8F8FF', // GhostWhite (pure white-ish)
+                '#FFF0F5', // LavenderBlush (very light pink)
+                '#F0F8FF', // AliceBlue (very light blue)
+                '#F0FFFF', // Azure (very light cyan/turquoise)
+                '#E6E6FA', // Lavender (light purple)
+                '#ADD8E6', // LightBlue (light blue)
+                '#AFEEEE', // PaleTurquoise (light turquoise)
+                '#E0FFFF', // LightCyan (very light blue/cyan)
+                '#D8BFD8', // Thistle (light purple)
+                '#B0E0E6'  // PowderBlue (light blue)
+            ];
+            const baseBlurAmount = 5;
+            const baseGlowAmount = 15;
+
+            // Function to resize the canvas and adjust particle count
+            function resizeCanvas() {
+                mainCanvas.width = window.innerWidth;
+                mainCanvas.height = window.innerHeight;
+                mouseX = mainCanvas.width / 2;
+                mouseY = mainCanvas.height / 2;
+
+                // Adjust particle count based on screen width
+                const newParticleCount = window.innerWidth < 768 ? 50 : 150; // Fewer particles on smaller screens
+                if (newParticleCount !== particleCount) {
+                    particleCount = newParticleCount;
+                    reinitializeParticles(); // Reinitialize background particles
+                }
+            }
+
+            // Function to reinitialize background particles
+            function reinitializeParticles() {
+                particles.length = 0; // Clear existing particles
+                for (let i = 0; i < particleCount; i++) {
+                    particles.push(new Particle());
+                }
+            }
+
+            // Star class (for static background dots)
+            class Star {
+                constructor() {
+                    this.x = Math.random() * mainCanvas.width;
+                    this.y = Math.random() * mainCanvas.height;
+                    this.size = Math.random() * 1.5 + 0.5;
+                    this.opacity = Math.random() * 0.2 + 0.05;
+                }
+
+                draw() {
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, this.size / 2, 0, Math.PI * 2);
+                    ctx.fillStyle = '#FFFFFF';
+                    ctx.globalAlpha = this.opacity;
+                    ctx.fill();
+                    ctx.globalAlpha = 1;
+                }
+            }
+
+            // Base Particle class (moving lights)
+            class Particle {
+                constructor() {
+                    this.reset();
+                }
+
+                reset() {
+                    this.x = Math.random() * mainCanvas.width;
+                    this.y = Math.random() * mainCanvas.height;
+                    this.size = Math.random() * 30 + 10;
+                    this.initialSpeed = (Math.random() * 0.3) + 0.15;
+                    this.speedX = (Math.random() - 0.5) * 2;
+                    this.speedY = (Math.random() - 0.5) * 2;
+                    this.color = particleColors[Math.floor(Math.random() * particleColors.length)];
+                    
+                    this.opacityPhase = Math.random() * Math.PI * 2;
+                    this.opacitySpeed = (Math.random() * 0.005) + 0.002;
+                    this.minOpacity = 0.3;
+                    this.maxOpacity = 0.8;
+
+                    this.blur = baseBlurAmount + Math.random() * 5;
+                    this.glow = baseGlowAmount + Math.random() * 10;
+                }
+
+                update() {
+                    let currentSpeed = this.initialSpeed;
+                    const currentRepelStrengthAdjusted = isHovering ? cursorRepelStrength * hoverRepelMultiplier : cursorRepelStrength;
+
+                    const dx = this.x - mouseX;
+                    const dy = this.y - mouseY;
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+
+                    if (distance < cursorInfluenceRadius) {
+                        const angle = Math.atan2(dy, dx);
+                        const repelForce = (cursorInfluenceRadius - distance) / cursorInfluenceRadius * currentRepelStrengthAdjusted;
+                        this.speedX += Math.cos(angle) * repelForce;
+                        this.speedY += Math.sin(angle) * repelForce;
+                        const currentTotalSpeed = Math.sqrt(this.speedX * this.speedX + this.speedY * this.speedY);
+                        if (currentTotalSpeed > currentSpeed * 3) {
+                            this.speedX = (this.speedX / currentTotalSpeed) * currentSpeed * 3;
+                            this.speedY = (this.speedY / currentTotalSpeed) * currentSpeed * 3;
+                        }
+                    }
+
+                    this.x += this.speedX * currentSpeed;
+                    this.y += this.speedY * currentSpeed;
+
+                    this.opacityPhase += this.opacitySpeed;
+                    this.opacity = ((Math.sin(this.opacityPhase) + 1) / 2) * (this.maxOpacity - this.minOpacity) + this.minOpacity;
+
+                    if (this.x < -this.size) this.x = mainCanvas.width + this.size;
+                    if (this.x > mainCanvas.width + this.size) this.x = -this.size;
+                    if (this.y < -this.size) this.y = mainCanvas.height + this.size;
+                    if (this.y > mainCanvas.height + this.size) this.y = -this.size;
+                }
+
+                draw() {
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, this.size / 2 + 5, 0, Math.PI * 2);
+                    ctx.fillStyle = this.color;
+                    ctx.globalAlpha = this.opacity * 0.4;
+                    ctx.shadowBlur = this.glow * 1.5;
+                    ctx.shadowColor = this.color;
+                    ctx.filter = `blur(${this.blur * 1.5}px)`;
+                    ctx.fill();
+
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, this.size / 2, 0, Math.PI * 2);
+                    ctx.fillStyle = this.color;
+                    ctx.globalAlpha = this.opacity;
+                    ctx.shadowBlur = this.glow;
+                    ctx.shadowColor = this.color;
+                    ctx.filter = `blur(${this.blur}px)`;
+                    ctx.fill();
+
+                    ctx.globalAlpha = 1;
+                    ctx.shadowBlur = 0;
+                    ctx.shadowColor = 'rgba(0,0,0,0)';
+                    ctx.filter = 'none';
+                }
+            }
+
+            // Title Particle Class (fixed position, no eyes)
+            class TitleParticle extends Particle {
+                constructor(initialX, initialY) {
+                    super();
+                    this.x = initialX;
+                    this.y = initialY;
+                    this.size = 40;
+                    this.initialSpeed = 0.05;
+                    this.speedX = (Math.random() - 0.5) * 0.5;
+                    this.speedY = (Math.random() - 0.5) * 0.5;
+                    this.color = '#E6E6FA';
+                    this.opacityPhase = Math.random() * Math.PI * 2;
+                    this.opacitySpeed = 0.005;
+                    this.minOpacity = 0.6;
+                    this.maxOpacity = 0.9;
+                    this.blur = 0.1;
+                    this.glow = 10;
+                }
+
+                update() {
+                    this.x += this.speedX * this.initialSpeed;
+                    this.y += this.speedY * this.initialSpeed;
+
+                    const maxOffset = 5;
+                    const headerH1 = document.querySelector('header h1');
+                    const textSpan = headerH1.querySelector('span:last-child');
+                    if (!textSpan) {
+                        this.x = mainCanvas.width / 2 - 30;
+                        this.y = 40;
+                        return;
+                    }
+
+                    const h1Rect = headerH1.getBoundingClientRect();
+                    const textRect = textSpan.getBoundingClientRect();
+                    
+                    const targetX = textRect.left - this.size / 2 - 8;
+                    const targetY = textRect.top + textRect.height / 2;
+
+                    const dx = this.x - targetX;
+                    const dy = this.y - targetY;
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+
+                    if (distance > maxOffset) {
+                        const angle = Math.atan2(dy, dx);
+                        this.x -= Math.cos(angle) * (distance - maxOffset) * 0.05;
+                        this.y -= Math.sin(angle) * (distance - maxOffset) * 0.05;
+                    }
+
+                    this.opacityPhase += this.opacitySpeed;
+                    this.opacity = ((Math.sin(this.opacityPhase) + 1) / 2) * (this.maxOpacity - this.minOpacity) + this.minOpacity;
+                }
+            }
+
+            // Class for particles under buttons (no eyes)
+            class ButtonParticle extends Particle {
+                constructor(buttonElement) {
+                    super();
+                    this.buttonElement = buttonElement;
+                    this.size = Math.random() * 10 + 20; // Varied size: between 20 and 30
+                    this.initialSpeed = (Math.random() * 0.1) + 0.2; // Faster movement: between 0.2 and 0.3
+                    this.speedX = (Math.random() - 0.5) * 0.5;
+                    this.speedY = (Math.random() - 0.5) * 0.5;
+                    this.color = particleColors[Math.floor(Math.random() * particleColors.length)]; // Varied colors
+                    this.opacityPhase = Math.random() * Math.PI * 2;
+                    this.opacitySpeed = (Math.random() * 0.005) + 0.002;
+                    this.minOpacity = 0.6;
+                    this.maxOpacity = 0.9;
+                    this.blur = 0.1; // Sharper outline
+                    this.glow = 15;
+                }
+
+                update() {
+                    const rect = this.buttonElement.getBoundingClientRect();
+                    const targetX = rect.left + rect.width / 2;
+                    const targetY = rect.bottom + this.size / 2 + 10;
+
+                    const dx = this.x - targetX;
+                    const dy = this.y - targetY;
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+
+                    const pullStrength = 0.03;
+                    this.x -= dx * pullStrength;
+                    this.y -= dy * pullStrength;
+
+                    this.x += this.speedX * this.initialSpeed;
+                    this.y += this.speedY * this.initialSpeed;
+
+                    this.opacityPhase += this.opacitySpeed;
+                    this.opacity = ((Math.sin(this.opacityPhase) + 1) / 2) * (this.maxOpacity - this.minOpacity) + this.minOpacity;
+                }
+            }
+
+            // Initialization and start of animation
+            resizeCanvas(); // Initial canvas size and particle count setup
+
+            // Initialize stars
+            for (let i = 0; i < starCount; i++) {
+                stars.push(new Star());
+            }
+
+            // Initialize general background particles based on initial particleCount
+            reinitializeParticles();
+
+            // Initialize title particle
+            const titleParticleInstance = new TitleParticle(0, 0);
+
+            // Initialize button particles
+            const buttonParticles = [];
+            buttons.forEach(button => {
+                buttonParticles.push(new ButtonParticle(button));
+            });
+
+
+            // Animation loop
+            function animate() {
+                ctx.clearRect(0, 0, mainCanvas.width, mainCanvas.height); // Clear the single canvas
+
+                // Drawing order ensures correct layering
+                stars.forEach(star => {
+                    star.draw();
+                });
+
+                particles.forEach(particle => {
+                    particle.update();
+                    particle.draw();
+                });
+
+                // Draw button particles (appear above HTML elements due to drawing order on single canvas)
+                buttonParticles.forEach(bParticle => {
+                    bParticle.update();
+                    bParticle.draw();
+                });
+
+                // Draw the title particle last (appears above HTML elements and other particles)
+                titleParticleInstance.update();
+                titleParticleInstance.draw();
+
+
+                requestAnimationFrame(animate);
+            }
+
+            // Event listener for window resize
+            window.addEventListener('resize', () => {
+                resizeCanvas(); // This will also reinitialize background particles if count changes
+                // Re-initialize title particle position on resize
+                const headerH1 = document.querySelector('header h1');
+                const textSpan = headerH1.querySelector('span:last-child');
+                if (textSpan) {
+                    const h1Rect = headerH1.getBoundingClientRect();
+                    const textRect = textSpan.getBoundingClientRect();
+                    
+                    const targetX = textRect.left - titleParticleInstance.size / 2 - 8;
+                    const targetY = textRect.top + textRect.height / 2;
+
+                    titleParticleInstance.x = targetX;
+                    titleParticleInstance.y = targetY;
+                }
+                // Re-initialize button particles positions on resize
+                buttons.forEach((button, index) => {
+                    buttonParticles[index].update();
+                });
+            });
+
+
+            // Event listener for mouse movement to track cursor position
+            mainCanvas.addEventListener('mousemove', function(e) {
+                mouseX = e.clientX;
+                mouseY = e.clientY;
+            });
+
+            // Event listener for button hover
+            buttons.forEach(button => {
+                button.addEventListener('mouseover', function() {
+                    isHovering = true;
+                });
+                button.addEventListener('mouseout', function() {
+                    isHovering = false;
+                });
+            });
+
+            animate();
+        });
+    </script>
+
+</body>
+</html>
+
