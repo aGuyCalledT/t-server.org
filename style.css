@@ -1,0 +1,335 @@
+/* CSS variables for easy Dark Mode theme customization */
+:root {
+    --background-color: #121212; /* Very dark background */
+    --text-color: #e0e0e0; /* Light text color */
+    --primary-color: #8be9fd; /* Accent color for links and important elements */
+    --secondary-color: #50fa7b; /* Hover color */
+    --header-footer-bg: rgba(20, 20, 20, 0.7); /* Semi-transparent dark grey */
+    --dropdown-bg: rgba(30, 30, 30, 0.9); /* Darker, less transparent dropdown background */
+    --border-color: rgba(255, 255, 255, 0.1); /* Subtle border color */
+    
+    /* New variables for button layout */
+    --button-base-size: 180px; /* Base size for buttons on desktop */
+    --button-gap: 20px; /* Gap between buttons and rows */
+    --side-padding: 2rem; /* Standard padding from screen edges */
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: var(--background-color);
+    color: var(--text-color);
+    min-height: 100vh; /* Changed to 100vh to ensure footer stays at bottom */
+    display: flex;
+    flex-direction: column;
+    position: relative; /* Important for the background image pseudo-element */
+    overflow-x: hidden; /* Prevents horizontal scrollbars */
+}
+
+/* Generic dark background image with overlay */
+body::before {
+    content: '';
+    position: fixed; /* Fixed so it stays when scrolling */
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    /* Example image: Dark, abstract texture. Can be replaced. */
+    background-image: url('https://images.pexels.com/photos/998641/pexels-photo-998641.jpeg'); /* Placeholder, ideally a real, dark image */
+    background-size: cover;
+    background-position: center;
+    filter: brightness(0.3) contrast(1.2); /* Makes it darker and more contrasting */
+    z-index: -1; /* Behind the content */
+    animation: fadeInBackground 1.5s ease-out forwards; /* Smooth background fade-in */
+}
+
+@keyframes fadeInBackground {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+/* Header style */
+header {
+    background-color: var(--header-footer-bg);
+    padding: 1rem var(--side-padding);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    backdrop-filter: blur(8px); /* Blur for the semi-transparent effect */
+    border-bottom: 1px solid var(--border-color);
+    position: sticky; /* Stays at the top when scrolling */
+    top: 0;
+    z-index: 100; /* Ensures the header is above other content */
+    /* Combines depth shadow with the new glow effect */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2), 0 0 15px rgba(139, 233, 253, 0.4); /* Light shadow + Glow effect */
+    /* Removed curves, header is now rectangular again */
+    border-radius: 0; 
+}
+
+.site-title {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--text-color);
+    text-decoration: none;
+    transition: color 0.3s ease;
+    border-radius: 5px; /* Rounded corners */
+}
+
+.site-title:hover {
+    color: var(--primary-color);
+}
+
+/* Navigation style */
+nav {
+    position: relative;
+}
+
+.nav-toggle {
+    /* Hamburger icon is always visible to trigger the dropdown menu */
+    display: block; 
+    background: none;
+    border: none;
+    color: var(--text-color);
+    font-size: 2rem;
+    cursor: pointer;
+    padding: 0.5rem;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+}
+
+.nav-toggle:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.nav-links {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: none; /* Hidden by default for the dropdown behavior */
+    flex-direction: column; /* Stacks links vertically in dropdown */
+    position: absolute;
+    top: 100%; /* Positions below the header */
+    right: 0; /* Aligns to the right */
+    background-color: var(--dropdown-bg);
+    min-width: 180px;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.5);
+    z-index: 10; /* Above other content */
+    border-radius: 8px;
+    overflow: hidden;
+    backdrop-filter: blur(12px);
+    border: 1px solid var(--border-color);
+    animation: slideInDropdown 0.3s ease-out forwards;
+    transform-origin: top right;
+}
+
+.nav-links.active {
+    display: flex; /* Shows the dropdown when active */
+}
+
+.nav-links li {
+    width: 100%; /* Full width within dropdown */
+    text-align: left; /* Align text within dropdown links */
+}
+
+.nav-links a {
+    color: var(--text-color);
+    text-decoration: none;
+    padding: 12px 16px; /* Padding for dropdown links */
+    display: block;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.nav-links a:hover {
+    background-color: rgba(255, 255, 255, 0.08);
+    color: var(--primary-color);
+}
+
+@keyframes slideInDropdown {
+    from { opacity: 0; transform: scaleY(0.8) translateY(-10px); }
+    to { opacity: 1; transform: scaleY(1) translateY(0); }
+}
+
+/* Main content area */
+main {
+    flex-grow: 1; /* Takes up remaining space */
+    padding: 4rem var(--side-padding); /* Padding from screen edges */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    position: relative; /* For z-index in case of overlap */
+    z-index: 1; /* Above the background image */
+}
+
+/* Wrapper for buttons (now a Grid container) */
+.button-grid-container {
+    display: grid;
+    gap: var(--button-gap);
+    justify-content: center; /* Centers grid items horizontally */
+    align-items: center;
+    width: 100%; /* Takes full width of main padding */
+    max-width: calc(3 * var(--button-base-size) + 2 * var(--button-gap)); /* Standard max-width for 3 buttons */
+    margin: 0 auto; /* Centers the wrapper */
+    animation: slideInContent 0.8s ease-out forwards;
+    opacity: 0;
+
+    /* Default Desktop: 3 columns, auto-fits */
+    grid-template-columns: repeat(auto-fit, minmax(var(--button-base-size), 1fr));
+    grid-auto-rows: var(--button-base-size); /* Makes rows square */
+}
+
+@keyframes slideInContent {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Style for action buttons */
+.action-button {
+    background-color: rgba(40, 40, 40, 0.7); /* Slightly lighter transparent background */
+    color: var(--text-color);
+    text-decoration: none;
+    padding: 1rem; /* Padding inside the button */
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px; /* Gap between icon and text */
+    transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.05); /* Subtle border */
+    
+    /* Makes the button square */
+    aspect-ratio: 1 / 1;
+    /* Controls button width based on number in row */
+    width: 100%; /* Fills available column width */
+    max-width: var(--button-base-size); /* Max width for desktop */
+    box-sizing: border-box; /* Include padding in width */
+}
+
+.action-button:hover {
+    background-color: rgba(60, 60, 60, 0.8); /* Darker on hover */
+    transform: translateY(-5px); /* Lift effect */
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4); /* More prominent shadow */
+    color: var(--secondary-color); /* Text color changes on hover */
+}
+
+.button-icon {
+    width: 60px; /* Icon size */
+    height: 60px;
+    object-fit: contain; /* Ensures the image fits */
+    border-radius: 5px; /* Slightly rounded icon corners */
+    filter: drop-shadow(0 0 5px rgba(139, 233, 253, 0.3)); /* Subtle glow effect */
+}
+
+.action-button span {
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+/* Footer style */
+footer {
+    background-color: var(--header-footer-bg);
+    padding: 1.5rem var(--side-padding);
+    text-align: center;
+    font-size: 0.9rem;
+    color: var(--text-color);
+    border-top: 1px solid var(--border-color);
+    backdrop-filter: blur(8px); /* Blur for the semi-transparent effect */
+    /* Combines depth shadow with the new glow effect */
+    box-shadow: 0 -4px 8px rgba(0, 0, 0, 0.2), 0 0 15px rgba(139, 233, 253, 0.4); /* Light shadow + Glow effect */
+    /* Removed curves, footer is now rectangular again */
+    border-radius: 0;
+}
+
+footer a {
+    color: var(--primary-color);
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+footer a:hover {
+    color: var(--secondary-color);
+}
+
+/* Responsive design for smaller screens */
+
+/* Breakpoint for 2 buttons per row */
+@media (max-width: 1000px) {
+    .button-grid-container {
+        /* Forces 2 columns when there's not enough space for 3 */
+        grid-template-columns: repeat(auto-fit, minmax(calc(var(--button-base-size) * 0.8), 1fr));
+        max-width: calc(2 * var(--button-base-size) + 1 * var(--button-gap)); /* Max width for 2 buttons */
+    }
+}
+
+/* Breakpoint for 1 button per row (Mobile) */
+@media (max-width: 700px) {
+    header {
+        flex-wrap: wrap;
+        justify-content: space-between;
+        padding: 1rem;
+        /* Removed curves on small screens */
+        border-radius: 0; 
+    }
+
+    .site-title {
+        font-size: 1.5rem;
+        margin-bottom: 0;
+    }
+
+    /* Mobile navigation links */
+    .nav-links {
+        /* On mobile, nav-links acts as the full-width dropdown */
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0; /* Spans full width */
+        width: 100%;
+        border-radius: 0 0 8px 8px; /* Rounded bottom corners */
+        border-top: 1px solid var(--border-color);
+    }
+
+    .nav-links li {
+        border-bottom: 1px solid rgba(255,255,255,0.05); /* Subtle separator */
+    }
+    .nav-links li:last-child {
+        border-bottom: none;
+    }
+
+    .nav-links a {
+        padding: 1rem; /* Larger touch targets */
+        text-align: center; /* Center text in mobile dropdown */
+    }
+
+    /* Adjustments for buttons on very small screens */
+    .button-grid-container {
+        grid-template-columns: 1fr; /* One column */
+        max-width: 300px; /* Narrower for mobile view to maintain spacing */
+        padding: 0; /* Wrapper has no extra padding here, as Main already has it */
+    }
+    .action-button {
+        flex-direction: row; /* Icon and text side-by-side */
+        justify-content: flex-start; /* Left-aligned */
+        padding: 0.8rem 1rem;
+        aspect-ratio: auto; /* Not square in this view */
+        flex-basis: 100%; /* Fills available width */
+        max-width: 100%; /* Reset max-width */
+    }
+    .button-icon {
+        width: 40px;
+        height: 40px;
+        margin-right: 10px;
+    }
+    .action-button span {
+        font-size: 1rem;
+    }
+
+    footer {
+        /* Removed curves on small screens */
+        border-radius: 0;
+    }
+}
+
