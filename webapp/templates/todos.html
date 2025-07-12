@@ -1,0 +1,11 @@
+{% extends 'base.html' %} {% block content %}
+<h1> Todo List </h1>
+<p>This is a list of all the movies, that are requested for t-server.org</p>
+<ul> 
+    {% for todo in todos %}
+    <li>
+        {{ todo.title }}: {% if todo.completed %}completed!{% else %}in progress...{% endif %}
+    </li>
+    {% endfor %}
+</ul>
+{% endblock %}

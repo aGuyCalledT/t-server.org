@@ -1,4 +1,4 @@
-/* CSS variables for easy Dark Mode theme customization */
+/* css variables for easy dark mode theme customization */
 :root {
     --background-color: #121212;
     --text-color: #e0e0e0;
@@ -8,14 +8,14 @@
     --dropdown-bg: rgba(30, 30, 30, 0.9);
     --border-color: rgba(255, 255, 255, 0.1);
     
-    /* New variables for button layout */
+    /* new variables for button layout */
     --button-base-size: 180px;
     --button-gap: 20px;
     --side-padding: 2rem;
 }
 
 body {
-    font-family: 'Inter', sans-serif;
+    font-family: 'inter', sans-serif;
     margin: 0;
     padding: 0;
     background-color: var(--background-color);
@@ -27,7 +27,7 @@ body {
     overflow-x: hidden;
 }
 
-/* Generic dark background image with overlay */
+/* generic dark background image with overlay */
 body::before {
     content: '';
     position: fixed;
@@ -40,16 +40,16 @@ body::before {
     background-position: center;
     filter: brightness(0.3) contrast(1.2);
     z-index: -1;
-    animation: fadeInBackground 1.5s ease-out forwards, panBackground 30s linear infinite alternate;
+    animation: fadeinbackground 1.5s ease-out forwards, panbackground 30s linear infinite alternate;
 }
 
-@keyframes fadeInBackground {
+@keyframes fadeinbackground {
     from { opacity: 0; }
     to { opacity: 1; }
 }
 
-/* Keyframes for background movement */
-@keyframes panBackground {
+/* keyframes for background movement */
+@keyframes panbackground {
     0% {
         background-position: 0% 0%;
     }
@@ -58,7 +58,7 @@ body::before {
     }
 }
 
-/* Header style */
+/* header style */
 header {
     background-color: var(--header-footer-bg);
     padding: 1rem var(--side-padding);
@@ -74,13 +74,13 @@ header {
     border-radius: 0;
 }
 
-/* Container for logo and text */
+/* container for logo and text */
 .logo-and-text {
     display: flex;
-    align-items: center; /* Ensures vertical alignment of logo and text */
+    align-items: center; /* ensures vertical alignment of logo and text */
 }
 
-/* Style for the header logo */
+/* style for the header logo */
 .header-logo {
     height: 50px;
     width: auto;
@@ -89,12 +89,12 @@ header {
 }
 
 .header-logo:hover {
-    transform: translateY(-3px);
+    transform: translatey(-3px);
     filter: brightness(1.2) drop-shadow(0 0 10px var(--primary-color));
     cursor: pointer;
 }
 
-/* Style for the text next to the logo */
+/* style for the text next to the logo */
 .site-name-text {
     font-size: 1.8rem;
     font-weight: 700;
@@ -107,7 +107,7 @@ header {
     color: var(--primary-color);
 }
 
-/* This .site-title style is redundant if you're using .site-name-text in <span> */
+/* this .site-title style is redundant if you're using .site-name-text in <span> */
 .site-title {
     font-size: 1.8rem;
     font-weight: 700;
@@ -121,7 +121,7 @@ header {
     color: var(--primary-color);
 }
 
-/* Navigation style */
+/* navigation style */
 nav {
     position: relative;
 }
@@ -159,7 +159,7 @@ nav {
     overflow: hidden;
     backdrop-filter: blur(12px);
     border: 1px solid var(--border-color);
-    animation: slideInDropdown 0.3s ease-out forwards;
+    animation: slideindropdown 0.3s ease-out forwards;
     transform-origin: top right;
 }
 
@@ -185,12 +185,12 @@ nav {
     color: var(--primary-color);
 }
 
-@keyframes slideInDropdown {
-    from { opacity: 0; transform: scaleY(0.8) translateY(-10px); }
-    to { opacity: 1; transform: scaleY(1) translateY(0); }
+@keyframes slideindropdown {
+    from { opacity: 0; transform: scaley(0.8) translatey(-10px); }
+    to { opacity: 1; transform: scaley(1) translatey(0); }
 }
 
-/* Main content area */
+/* main content area */
 main {
     flex-grow: 1;
     padding: 4rem var(--side-padding);
@@ -203,7 +203,7 @@ main {
     z-index: 1;
 }
 
-/* Wrapper for buttons (now a Grid container) */
+/* wrapper for buttons (now a grid container) */
 .button-grid-container {
     display: grid;
     gap: var(--button-gap);
@@ -212,20 +212,20 @@ main {
     width: 100%;
     max-width: calc(3 * var(--button-base-size) + 2 * var(--button-gap));
     margin: 0 auto;
-    animation: slideInContent 0.8s ease-out forwards;
+    animation: slideincontent 0.8s ease-out forwards;
     opacity: 0;
 
-    /* Default Desktop: 3 columns, auto-fits */
+    /* default desktop: 3 columns, auto-fits */
     grid-template-columns: repeat(auto-fit, minmax(var(--button-base-size), 1fr));
     grid-auto-rows: var(--button-base-size);
 }
 
-@keyframes slideInContent {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
+@keyframes slideincontent {
+    from { opacity: 0; transform: translatey(20px); }
+    to { opacity: 1; transform: translatey(0); }
 }
 
-/* Style for action buttons */
+/* style for action buttons */
 .action-button {
     background-color: rgba(40, 40, 40, 0.7);
     color: var(--text-color);
@@ -249,7 +249,7 @@ main {
 
 .action-button:hover {
     background-color: rgba(60, 60, 60, 0.8);
-    transform: translateY(-5px);
+    transform: translatey(-5px);
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
     color: var(--secondary-color);
 }
@@ -267,7 +267,7 @@ main {
     font-weight: 600;
 }
 
-/* Footer style */
+/* footer style */
 footer {
     background-color: var(--header-footer-bg);
     padding: 1.5rem var(--side-padding);
@@ -290,7 +290,7 @@ footer a:hover {
     color: var(--secondary-color);
 }
 
-/* Responsive design for smaller screens */
+/* responsive design for smaller screens */
 @media (max-width: 1000px) {
     .button-grid-container {
         grid-template-columns: repeat(auto-fit, minmax(calc(var(--button-base-size) * 0.8), 1fr));
@@ -377,3 +377,4 @@ footer a:hover {
         border-radius: 0;
     }
 }
+

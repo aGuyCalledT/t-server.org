@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block title %} home {% endblock %}
+{% block content %}
+<div class="button-grid-container">
+    <a href="https://github.com/aGuyCalledT" target="_blank" class="action-button">
+        <img src="/static/github_logo.png" alt="GitHub Icon" class="button-icon">
+        <span>Github</span>
+    </a>
+    <a href="http://www.t-server.org:8096" target="_blank" class="action-button">
+        <img src="/static/media_logo.png" alt="Mediathek Icon" class="button-icon">
+        <span>Mediathek</span>
+    </a>
+    <a href="{% url 'webapp:wishlist' %}" class="action-button">
+        <img src="/static/movie.png" alt="Movie Icon" class="button-icon">
+        <span>Movie Wishlist</span>
+    </a>
+    <a href="#" class="action-button">
+        <img src="/static/projects_logo.png" alt="Projects Icon" class="button-icon">
+        <span>Projects</span>
+    </a>
+    <a href="#" class="action-button">
+        <img src="/static/ghost_logo.png" alt="Ghost Icon" class="button-icon">
+        <span>Ghost</span>
+    </a>
+    <a href="#" class="action-button">
+        <img src="/static/dnd_logo.png" alt="Dungeons & Dragons Icon" class="button-icon">
+        <span>Dungeons & Dragons</span>
+    </a>
+</div>
+<div class='readable-text-block'>
+<p>Welcome to my digital space. This website serves as a curated portal to my ongoing projects and interests, offering a direct glimpse into my practical applications of technology and creative endeavors. I'm genuinely delighted to share this work with you. Here, you'll find a centralized point of access to various initiatives, designed for easy navigation and quick discovery. Should you have any questions, feedback, or ideas, please feel free to reach out via the contact form. I'm always open to new perspectives and collaborative opportunities.</p>
+</div>
+
+{% endblock %}

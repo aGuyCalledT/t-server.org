@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>t-server.org - Movie Wish List</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" type="image/png" href="https://placehold.co/32x32/121212/e0e0e0?text=ICON">
+</head>
+<body>
+    <div class="star-field" id="star-field"></div>
+
+    <div id="content-wrapper">
+        <header>
+            <a href="#" class="logo-link">
+                <img src="https://placehold.co/50x50/121212/e0e0e0?text=LOGO" alt="Your Company Logo" class="header-logo">
+                <span class="site-name-text">t-server.org</span>
+            </a>
+            <nav>
+                <button class="nav-toggle" id="navToggle" aria-label="Open/close menu">☰</button>
+                <ul class="nav-links" id="navLinks">
+                    <li><a href="#">about me</a></li>
+                    <li><a href="#">contact</a></li>
+                    <li><a href="#">imprint</a></li>
+                </ul>
+            </nav>
+        </header>
+
+        <main>
+            <div class="todo-app-card">
+                <h1>Movie Wish List</h1>
+
+                <div class="flex flex-col sm:flex-row gap-4 mb-4">
+                    <input
+                        type="text"
+                        id="todoInput"
+                        class="flex-grow todo-input"
+                        placeholder="Add new movie and year (e.g., Movie 2023)..."
+                    />
+                    <button
+                        id="addButton"
+                        class="app-button"
+                    >
+                        Add
+                    </button>
+                </div>
+
+                <p id="errorMessage" class="error-message hidden">
+                    </p>
+
+                <ul id="todoList" class="space-y-3">
+                    </ul>
+            </div>
+        </main>
+
+        <footer>
+            <p>© 2025 t-server.org. All rights reserved. | <a href="#">Privacy Policy</a> | <a href="#">Terms of Service</a></p>
+            <div id="user-id-display">User ID: Loading...</div>
+        </footer>
+    </div>
+
+    <script type="module" src="script.js"></script>
+</body>
+</html>
