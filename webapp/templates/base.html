@@ -47,13 +47,11 @@
             {# Der Inhalt der einzelnen Seiten wird hier eingefügt #}
             {% endblock content %}
         </main>
-
         <footer>
-            {# Für 'privacy' und 'terms' wird ebenfalls 'webapp:' angenommen, wenn sie in webapp/urls.py definiert sind. #}
-            {# Falls sie *nicht* in webapp/urls.py sind, sondern z.B. direkt in server/urls.py, lasse den Namespace weg. #}
             <p>© 2025 t-server.org. All rights reserved. | <a href="{% url 'webapp:privacy' %}">Privacy Policy</a> | <a href="{% url 'webapp:terms' %}">Terms of Service</a> | <a href="{% url 'webapp:imprint' %}">Imprint</a></p>
-            {# Optional: Falls User ID Display nur auf bestimmten Seiten benötigt wird, verschiebe es in den jeweiligen Template-Block #}
-            {# <div id="user-id-display">User ID: Loading...</div> #}
+            <a href="https://www.deutschlandistvegan.de/" target="_blank" class="footer-image-link">
+            <img src="/static/vegan.png" alt="Vegan friendly" class="footer-image">
+            </a>
         </footer>
     </div>
 

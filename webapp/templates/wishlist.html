@@ -3,11 +3,9 @@
 {% block content %}
 
 <section>
-    <h1>Movie Wishlist</h1>
+    <h1>Wishlist</h1>
     <p>Add your favorite movies to the wishlist and see what others are looking forward to!</p>
-
-    <h2>Add a New Movie</h2>
-    <form method="post" class="contact-form">
+    <form method="post" class="movie-form"> {# Angepasste Klasse #}
         {% csrf_token %}
         <div class="form-group-inline"> {# Container für Titel und Jahr nebeneinander #}
             <div class="form-field-wrapper"> {# Wrapper für das Titel-Feld #}
@@ -36,70 +34,238 @@
             {% endfor %}
         {% endif %}
 
-        <button type="submit" class="submit-button">Add Movie</button>
+        <button type="submit" class="submit-button">add movie</button>
     </form>
 
-    <h2 style="margin-top: 3rem;">Current Wishlist</h2>
     {% if movies %}
     <div class="movie-card-grid"> {# Container für die Film-Karten #}
         {% for movie in movies %}
         <div class="movie-card">
-            <h3>
-                {{ movie.title }}
-                {% if movie.year %}
-                    <span class="movie-year">({{ movie.year }})</span>
-                {% endif %}
-            </h3>
-            <p class="movie-added-date">Added: {{ movie.added_date }}</p>
-            <div class="movie-likes">
-                <form method="post" action="{% url 'webapp:like_movie' movie_index=forloop.counter0 %}" style="display:inline;">
+            <div class="movie-info">
+                {# Platzhalter für das Filmcover #}
+                <div class="movie-cover-placeholder">
+                    <img src="https://via.placeholder.com/100x150?text=No+Cover" alt="Movie Cover Placeholder">
+                </div>
+                <div>
+                    <h3>
+                        {{ movie.title }}
+                        {% if movie.year %}
+                            <span class="movie-year">({{ movie.year }})</span>
+                        {% endif %}
+                    </h3>
+                    <p class="movie-added-date">Added: {{ movie.added_date }}</p>
+                </div>
+            </div>
+            
+            <div class="movie-actions">
+                <div class="movie-likes">
+                    <form method="post" action="{% url 'webapp:like_movie' movie_index=movie.index %}" style="display:inline;">
+                        {% csrf_token %}
+                        <button type="submit" class="like-button" title="Like this movie">
+                            <span class="heart-icon">❤</span>
+                        </button>
+                    </form>
+                    <span>{{ movie.likes }}</span> Likes
+                </div>
+                <form method="post" action="{% url 'webapp:delete_movie' movie_index=movie.index %}" style="display:inline;">
                     {% csrf_token %}
-                    <button type="submit" class="like-button" title="Like this movie">
-                        <span class="heart-icon">❤</span>
+                    <button type="submit" class="delete-button" title="Delete this movie" onclick="return confirm('Are you sure you want to delete {{ movie.title }}?');">
+                        Delete
                     </button>
                 </form>
-                <span>{{ movie.likes }}</span> Likes
             </div>
         </div>
         {% endfor %}
     </div>
     {% else %}
-    <p>No movies added to the wishlist yet. Be the first to add one!</p>
+    <p class="no-movies-message">No movies added to the wishlist yet. Be the first to add one!</p>
     {% endif %}
 </section>
 
 <style>
-    /* Basic styling for inline form fields */
+    /* Allgemeine Anpassungen für ein Dark-Theme */
+    body {
+        background-color: #1e1e1e; /* Dunkler Hintergrund */
+        color: #e0e0e0; /* Helle Textfarbe */
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    h1, h2, h3 {
+        color: #ffffff; /* Weißere Überschriften */
+    }
+
+    a {
+        color: #8ab4f8; /* Leuchtendes Blau für Links */
+    }
+
+    p {
+        color: #cccccc;
+    }
+
+    section {
+        background-color: #2a2a2a; /* Etwas hellerer Bereich für den Inhalt */
+        padding: 30px;
+        border-radius: 8px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+        margin: 20px auto;
+        max-width: 900px; /* Max-Breite für bessere Lesbarkeit */
+    }
+
+    /* Formular-Styling */
+    .movie-form { /* Angepasste Klasse */
+        background-color: #333333;
+        padding: 20px;
+        border-radius: 6px;
+        margin-bottom: 30px;
+    }
+
     .form-group-inline {
         display: flex;
-        gap: 20px; /* Adjust spacing between fields */
+        gap: 20px;
         margin-bottom: 20px;
     }
 
     .form-field-wrapper {
-        flex: 1; /* Allow fields to take equal space */
+        flex: 1;
     }
 
-    .form-group-inline label {
+    .movie-form label { /* Angepasste Klasse */
         display: block;
-        margin-bottom: 5px;
+        margin-bottom: 8px;
         font-weight: bold;
+        color: #e0e0e0;
+        text-align: left;
     }
 
-    .form-group-inline input[type="text"] {
-        width: 100%; /* Make input fields take full width of their wrapper */
-        padding: 8px;
-        border: 1px solid #ccc;
+    .movie-form input[type="text"] { /* Angepasste Klasse */
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #555;
         border-radius: 4px;
-        box-sizing: border-box; /* Include padding and border in the element's total width and height */
+        background-color: #444444;
+        color: #e0e0e0;
+        box-sizing: border-box;
     }
 
-    /* Styling for the heart icon */
-    .heart-icon {
-        color: red;
-        font-size: 1.2em; /* Slightly larger heart */
+    .movie-form input[type="text"]:focus {
+        border-color: #8ab4f8;
+        outline: none;
+    }
+
+    .submit-button {
+        background-color: #8ab4f8; /* Farbe passend zum Theme */
+        color: #1e1e1e;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
         cursor: pointer;
-        margin-right: 5px; /* Space between heart and like count */
+        font-size: 1em;
+        font-weight: bold;
+        transition: background-color 0.2s ease-in-out;
+    }
+
+    .submit-button:hover {
+        background-color: #6a9de8;
+    }
+
+    .error-text {
+        color: #ff6b6b; /* Helleres Rot für Fehlermeldungen */
+        font-size: 0.9em;
+        margin-top: 5px;
+    }
+
+    /* Movie Card Styling */
+    .movie-card-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); /* Breitere Karten */
+        gap: 25px;
+        margin-top: 20px;
+    }
+
+    .movie-card {
+        background-color: #333333; /* Dunklere Kartenhintergrund */
+        border: 1px solid #444444;
+        border-radius: 8px;
+        padding: 20px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+        display: flex;
+        flex-direction: column; /* Anordnung von Cover und Info */
+        justify-content: space-between; /* Inhalte oben und unten ausrichten */
+    }
+
+    .movie-info {
+        display: flex;
+        align-items: flex-start; /* Aligne items at the top */
+        gap: 15px; /* Abstand zwischen Cover und Text */
+        margin-bottom: 15px; /* Abstand zu Aktionen */
+    }
+
+    .movie-cover-placeholder {
+        flex-shrink: 0; /* Verhindert, dass das Bild schrumpft */
+        width: 100px; /* Feste Breite für Cover */
+        height: 150px; /* Feste Höhe für Cover */
+        background-color: #444;
+        border-radius: 4px;
+        overflow: hidden; /* Sicherstellen, dass das Bild innerhalb des Rahmens bleibt */
+    }
+
+    .movie-cover-placeholder img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover; /* Bildausschnitt füllen */
+        display: block; /* Entfernt zusätzlichen Platz unter dem Bild */
+    }
+
+    .movie-info > div { /* Der Div, der Titel und Datum enthält */
+        flex-grow: 1;
+    }
+
+    .movie-card h3 {
+        margin-top: 0;
+        margin-bottom: 8px;
+        color: #ffffff;
+        font-size: 1.3em;
+    }
+
+    .movie-year {
+        font-size: 0.85em;
+        color: #bbbbbb;
+        font-weight: normal;
+        margin-left: 5px;
+    }
+
+    .movie-added-date {
+        font-size: 0.8em;
+        color: #aaaaaa;
+        margin-bottom: 0; /* Kein zusätzlicher Margin */
+    }
+
+    .movie-actions {
+        display: flex;
+        justify-content: space-between; /* Herz/Likes links, Delete Button rechts */
+        align-items: center;
+        margin-top: auto; /* Push actions to the bottom */
+        padding-top: 15px; /* Abstand zum oberen Inhalt */
+        border-top: 1px solid #444; /* Trennlinie */
+    }
+
+    .movie-likes {
+        display: flex;
+        align-items: center;
+        font-weight: bold;
+        color: #c0c0c0; /* Hellerer Grauton */
+    }
+
+    .heart-icon {
+        color: #e91e63; /* Kräftiges Rot für das Herz */
+        font-size: 1.5em; /* Größeres Herz */
+        cursor: pointer;
+        margin-right: 8px;
+        transition: transform 0.2s ease-in-out;
+    }
+
+    .heart-icon:hover {
+        transform: scale(1.2);
     }
 
     .like-button {
@@ -107,53 +273,32 @@
         border: none;
         padding: 0;
         cursor: pointer;
-        font-size: 1em; /* Ensures the button itself doesn't affect font size too much */
+        font-size: 1em;
+        color: inherit; /* Nimmt Farbe vom Elternelement an */
     }
 
-    .movie-card-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-        gap: 20px;
-        margin-top: 20px;
-    }
-
-    .movie-card {
-        border: 1px solid #eee;
-        border-radius: 8px;
-        padding: 15px;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        background-color: #fff;
-    }
-
-    .movie-card h3 {
-        margin-top: 0;
-        margin-bottom: 10px;
-        color: #333;
-    }
-
-    .movie-year {
+    .delete-button {
+        background-color: #f44336; /* Roter Löschen-Button */
+        color: white;
+        padding: 8px 12px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
         font-size: 0.9em;
-        color: #666;
-        font-weight: normal;
+        transition: background-color 0.2s ease-in-out;
     }
 
-    .movie-added-date {
-        font-size: 0.85em;
-        color: #888;
-        margin-bottom: 10px;
+    .delete-button:hover {
+        background-color: #d32f2f;
     }
 
-    .movie-likes {
-        display: flex;
-        align-items: center;
-        font-weight: bold;
-        color: #555;
-    }
-
-    .error-text {
-        color: red;
-        font-size: 0.85em;
-        margin-top: 5px;
+    .no-movies-message {
+        text-align: center;
+        color: #b0b0b0;
+        padding: 40px;
+        border: 1px dashed #555;
+        border-radius: 8px;
+        margin-top: 30px;
     }
 </style>
 {% endblock %}

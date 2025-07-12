@@ -1,11 +1,13 @@
+@import url('https://fonts.googleapis.com/css2?family=Merriweather+Sans:wght@300;400;700&family=Merriweather:wght@300;400;700&display=swap');
+
 :root {
     --background-color: #202124;
     --surface-color: #303134;
     --text-color: #e8eaed;
     --secondary-text-color: #bdc1c6;
-    --primary-color: #8ab4f8;
+    --primary-color: rgb(132, 121, 252);
     --border-color: #5f6368;
-    --hover-bg-color: rgba(138, 180, 248, 0.1);
+    --hover-bg-color: rgba(132, 121, 252, 0.1);
     --button-base-size: 180px;
     --button-gap: 20px;
     --side-padding: 2rem;
@@ -19,7 +21,7 @@ html, body {
 }
 
 body {
-    font-family: 'Inter', sans-serif;
+    font-family: 'Merriweather Sans', sans-serif;
     background-color: var(--background-color);
     color: var(--text-color);
     position: relative;
@@ -73,6 +75,7 @@ header {
     font-weight: 700;
     color: var(--text-color);
     transition: color 0.3s ease;
+    font-family: 'Merriweather Sans', sans-serif;
 }
 
 .site-name-text:hover {
@@ -245,6 +248,21 @@ footer {
     box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.2);
     border-radius: 0;
     margin-top: auto;
+    position: relative;
+}
+
+.footer-image-link {
+    position: absolute;
+    right: var(--side-padding);
+    top: 50%;
+    transform: translateY(-50%);
+    display: block; /* Ensure the link acts as a block for positioning */
+}
+
+.footer-image {
+    max-height: 3.5rem; /* Adjust as needed to fit existing footer height */
+    width: auto;
+    opacity: 0.5;
 }
 
 footer a {
@@ -268,27 +286,41 @@ section {
     text-align: left;
 }
 
+h1, h2, h3, h4, h5, h6 {
+    font-family: 'Merriweather', serif;
+    margin-top: 3rem;
+    margin-bottom: 0.4rem;
+}
+
 section h1 {
     color: var(--primary-color);
-    font-size: 1.8rem;
-    margin-bottom: 1.5rem;
-    text-align: center;
-    font-weight: normal;
+    font-size: 2.2rem;
+    margin-bottom: 0.6rem;
+    font-weight: 700;
+    text-align: left;
 }
 
 section h2 {
     color: var(--text-color);
-    font-size: 1.25rem;
-    margin-top: 2rem;
-    margin-bottom: 1rem;
-    font-weight: bold;
+    font-size: 1.6rem;
+    margin-top: 2.5rem;
+    font-weight: 700;
 }
 
 section h3 {
     color: var(--text-color);
-    font-size: 1rem;
-    margin-top: 1.5rem;
-    margin-bottom: 0.8rem;
+    font-size: 1.2rem;
+    margin-top: 2rem;
+    margin-bottom: 0.3rem;
+    font-weight: normal;
+    text-decoration: underline;
+}
+
+section h4, section h5, section h6 {
+    color: var(--text-color);
+    font-size: 1.1rem;
+    margin-top: 1.8rem;
+    margin-bottom: 0.2rem;
     font-weight: normal;
     text-decoration: underline;
 }
@@ -296,6 +328,10 @@ section h3 {
 section p, section ul, section li {
     line-height: 1.6;
     margin-bottom: 1rem;
+}
+
+section ul {
+    list-style-type: square;
 }
 
 section a {
@@ -330,7 +366,7 @@ section a:hover {
     border-radius: 4px;
     background-color: var(--background-color);
     color: var(--text-color);
-    font-family: 'Inter', sans-serif;
+    font-family: 'Merriweather Sans', sans-serif;
     font-size: 1rem;
 }
 
@@ -339,7 +375,7 @@ section a:hover {
 .form-group textarea:focus {
     border-color: var(--primary-color);
     outline: none;
-    box-shadow: 0 0 0 2px rgba(138, 180, 248, 0.3);
+    box-shadow: 0 0 0 2px rgba(132, 121, 252, 0.3);
 }
 
 .submit-button {
@@ -355,7 +391,7 @@ section a:hover {
 }
 
 .submit-button:hover {
-    background-color: #6a9ee5;
+    background-color: rgb(100, 90, 220);
 }
 
 .error-text {

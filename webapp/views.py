@@ -25,7 +25,7 @@ def read_movies_from_csv():
             expected_fieldnames = ['title', 'year', 'likes', 'added_date']
             if not reader.fieldnames or not all(f in reader.fieldnames for f in expected_fieldnames):
                 print(f"Warning: CSV file '{CSV_FILE_PATH}' has missing or incorrect headers. Recreating file with correct headers.")
-                with open(CSV_FILE_PATH, 'w', newline='', encoding='utf-8') as new_csvfile: # Hier wurde 'utf-analysis' zu 'utf-8' geändert
+                with open(CSV_FILE_PATH, 'w', newline='', encoding='utf-8') as new_csvfile:
                     writer = csv.writer(new_csvfile)
                     writer.writerow(expected_fieldnames)
                 return []
@@ -133,7 +133,8 @@ def wishlist_view(request):
                 movies.append(new_movie)
             
             # Sortiere die Filme nach Likes (absteigend) und dann nach Titel (aufsteigend)
-            movies.sort(key=lambda x: (x['likes'], x['title']), reverse=True)
+            # Wichtig: sortiere erst, BEVOR du in die CSV schreibst, damit die Reihenfolge persistent ist
+            movies.sort(key=lambda x: (x['likes'], x['title'].lower()), reverse=True) # '.lower()' für konsistente Sortierung
             
             try:
                 write_movies_to_csv(movies) # Gesamte (aktualisierte) Liste neu schreiben
@@ -144,10 +145,15 @@ def wishlist_view(request):
     else:
         form = MovieForm()
     
-    # Sortiere die Filme auch beim initialen Laden nach Likes
-    movies.sort(key=lambda x: (x['likes'], x['title']), reverse=True)
+    # Sortiere die Filme auch beim initialen Laden nach Likes, falls POST fehlschlägt oder GET ist
+    movies.sort(key=lambda x: (x['likes'], x['title'].lower()), reverse=True)
 
-    return render(request, 'wishlist.html', {'form': form, 'movies': movies})
+    # Füge einen Index zu jedem Film hinzu, um ihn später im Template referenzieren zu können
+    # Der Index ist wichtig für den Like- und Delete-Button
+    movies_with_indices = [{'index': i, **movie} for i, movie in enumerate(movies)]
+
+    return render(request, 'wishlist.html', {'form': form, 'movies': movies_with_indices})
+
 
 def like_movie(request, movie_index):
     if request.method == 'POST':
@@ -155,7 +161,7 @@ def like_movie(request, movie_index):
         if 0 <= movie_index < len(movies):
             movies[movie_index]['likes'] += 1
             # Sortiere die Liste neu nach dem Liken
-            movies.sort(key=lambda x: (x['likes'], x['title']), reverse=True)
+            movies.sort(key=lambda x: (x['likes'], x['title'].lower()), reverse=True)
             try:
                 write_movies_to_csv(movies)
                 return redirect('webapp:wishlist')
@@ -165,3 +171,20 @@ def like_movie(request, movie_index):
         else:
             return HttpResponse("Movie not found.", status=404)
     return redirect('webapp:wishlist') # Immer zur Wunschliste zurückleiten, auch bei GET
+
+
+def delete_movie(request, movie_index):
+    if request.method == 'POST': # Löschen sollte idealerweise per POST erfolgen
+        movies = read_movies_from_csv()
+        if 0 <= movie_index < len(movies):
+            del movies[movie_index] # Film aus der Liste entfernen
+            # Die Liste muss nicht neu sortiert werden, da ein Element gelöscht wurde
+            try:
+                write_movies_to_csv(movies)
+                return redirect('webapp:wishlist')
+            except IOError as e:
+                print(f"Error writing to movies.csv: {e}")
+                return HttpResponse("Error deleting movie. Please try again.", status=500)
+        else:
+            return HttpResponse("Movie not found.", status=404)
+    return redirect('webapp:wishlist') # Bei direktem GET-Zugriff auf delete_movie zur Wishlist umleiten
