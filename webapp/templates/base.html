@@ -14,7 +14,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700&display=swap" rel="stylesheet">
     
     {# Favicon, passe den Pfad an, wenn es sich um eine statische Datei handelt #}
-    <link rel="icon" type="image/png" href="{% static 'webapp/icon_white.png' %}">
+    <link rel="icon" type="image/png" href="{% static 't-icon.png' %}">
     {# Wenn icon_white.png im projektweiten static-Ordner liegt: #}
     {# <link rel="icon" type="image/png" href="{% static 'icon_white.png' %}"> #}
 
@@ -28,7 +28,7 @@
             {# Angepasst: 'home' ist jetzt 'webapp:home' #}
             <a href="{% url 'webapp:home' %}" class="logo-link"> 
                 {# logo_white.png wird als statische Datei angenommen #}
-                <img src="{% static 'logo_white.png' %}" alt="logo" class="header-logo">
+                <img src="{% static 't-icon.png' %}" alt="logo" class="header-logo">
                 {# Oder wenn logo_white.png im projektweiten static-Ordner liegt: #}
                 {# <img src="{% static 'logo_white.png' %}" alt="Dein Firmenlogo" class="header-logo"> #}
                 <span class="site-name-text">-server.org</span>
@@ -36,8 +36,8 @@
             <nav>
                 <button class="nav-toggle" id="navToggle" aria-label="Open/close menu">☰</button>
                 <ul class="nav-links" id="navLinks">
-                    <li><a href="{% url 'webapp:about_me' %}">About Me</a></li>
-                    <li><a href="{% url 'webapp:contact' %}">Contact</a></li>
+                    <li><a href="{% url 'webapp:about_me' %}">about me</a></li>
+                    <li><a href="{% url 'webapp:contact' %}">contact us</a></li>
                 </ul>
             </nav>
         </header>
@@ -48,10 +48,17 @@
             {% endblock content %}
         </main>
         <footer>
-            <p>© 2025 t-server.org. All rights reserved. | <a href="{% url 'webapp:privacy' %}">Privacy Policy</a> | <a href="{% url 'webapp:terms' %}">Terms of Service</a> | <a href="{% url 'webapp:imprint' %}">Imprint</a></p>
-            <a href="https://www.deutschlandistvegan.de/" target="_blank" class="footer-image-link">
-            <img src="/static/vegan.png" alt="Vegan friendly" class="footer-image">
-            </a>
+            <p>© 2025 t-server.org. All rights reserved. | <a href="{% url 'webapp:privacy' %}">privacy policy</a> | <a href="{% url 'webapp:terms' %}">terms of service</a> | <a href="{% url 'webapp:imprint' %}">imprint</a></p>
+            {# Der footer-images-container ist jetzt direkt im footer, aber wird absolut positioniert #}
+            <div class="footer-images-container">
+                <a href="https://www.deutschlandistvegan.de/" target="_blank" class="footer-image-link">
+                    <img src="{% static 'vegan.png' %}" alt="become vegan!" class="footer-image">
+                </a>
+                {# Hier können weitere Bilder eingefügt werden #}
+                <a href="https://www.die-linke.de/mitmachen/mitglied-werden/" target="_blank" class="footer-image-link">
+                    <img src="{% static 'die_linke.png' %}" alt="become a leftist!" class="footer-image">
+                </a>
+            </div>
         </footer>
     </div>
 
