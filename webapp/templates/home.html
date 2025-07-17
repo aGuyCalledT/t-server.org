@@ -3,16 +3,28 @@
 {% block content %}
 <div class="button-grid-container">
     <a href="https://github.com/aGuyCalledT" target="_blank" class="action-button">
-        <img src="/static/github-icon.png" alt="GitHub Icon" class="button-icon">
+        <img src="/static/github-icon.png" alt="GitHub Icon" class="button-icon" style="width: 50px;">
         <span>github</span>
     </a>
     <a href="http://www.t-server.org:8096" target="_blank" class="action-button">
-        <img src="/static/media-icon.png" alt="Mediathek Icon" class="button-icon">
+        <img src="/static/player-icon.png" alt="Mediathek Icon" class="button-icon" style="width: 60px;">
         <span>media library</span>
     </a>
     <a href="{% url 'webapp:wishlist' %}" class="action-button">
-        <img src="/static/wishlist-icon.png" alt="Movie Icon" class="button-icon">
+        <img src="/static/list-icon.png" alt="Wishlist" class="button-icon" style="width: 50px;">
         <span>movie wishlist</span>
+    </a>
+    <a href="#" class="action-button">
+        <img src="/static/ghost-icon.png" alt="Ghost" class="button-icon" style="width: 70px;">
+        <span>ghost</span>
+    </a>
+    <a href="#" class="action-button">
+        <img src="/static/package-icon.png" alt="Projects" class="button-icon" style="width: 40px;">
+        <span>projects</span>
+    </a>
+    <a href="#" class="action-button">
+        <img src="/static/dnd-icon.png" alt="DnD" class="button-icon" style="width: 60px;">
+        <span>d&d</span>
     </a>
 </div>
 <div class='readable-text-block'>

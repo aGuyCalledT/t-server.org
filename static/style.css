@@ -69,13 +69,13 @@ header {
 }
 
 .header-logo {
-    height: 40px;
+    height: 60px;
     width: auto;
-    margin-right: 10px;
+    margin-right: 5px;
 }
 
 .header-logo:hover {
-    transform: scale(1.05);
+    filter: drop-shadow(0 0 8px var(--primary-color-end));
 }
 
 .site-name-text {
@@ -220,7 +220,6 @@ main {
 
 .action-button:hover {
     background-color: var(--surface-color);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
 .action-button:active {
@@ -231,14 +230,14 @@ main {
 
 .button-icon {
     width: 50px;
-    height: 50px;
+    height: auto;
     object-fit: contain;
     border-radius: 8px;
     filter: none;
 }
 
 .action-button:hover .button-icon {
-    filter: drop-shadow(0 0 8px var(--primary-color-start));
+    filter: drop-shadow(0 0 8px var(--primary-color-end));
 }
 
 .action-button span {
@@ -329,30 +328,12 @@ footer {
 }
 
 footer a {
+    color: var(--primary-color-end);
     text-decoration: none;
-    background: var(--primary-color-start);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    color: transparent;
 }
 
 footer a:hover {
     text-decoration: underline;
-    background: var(--primary-gradient-hover);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    color: transparent;
-}
-
-footer a:active {
-    background: var(--primary-gradient);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    color: transparent;
-    transform: translateY(1px);
 }
 
 section {
@@ -365,64 +346,44 @@ section {
     text-align: left;
 }
 
+h1, h2, h3, h4, h5, h6 {
+    font-family: 'Grenze', serif;
+    margin-top: 4rem;
+    margin-bottom: 0rem;
+    color: var(--text-color);
+}
+
 section h1 {
     font-size: 2.2rem;
     margin-bottom: 0rem;
     font-weight: 700;
     text-align: left;
-    background: var(--primary-gradient);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    color: transparent;
-}
-
-section h1:hover {
-    background: var(--primary-gradient-hover);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    color: transparent;
-}
-
-h1, h2, h3, h4, h5, h6 {
-    font-family: 'Grenze', serif;
-    margin-top: 4rem;
-    margin-bottom: 0rem;
+    color: var(--primary-color-end);
 }
 
 section h2 {
-    color: #ffffff;
     font-size: 1.6rem;
-    margin-top: 2.5rem;
     font-weight: 700;
 }
 
 section h3 {
-    color: #ffffff;
     font-size: 1.2rem;
-    margin-top: 2rem;
-    margin-bottom: 0.3rem;
     font-weight: normal;
     text-decoration: underline;
 }
 
 section h4, section h5, section h6 {
-    color: var(--text-color);
     font-size: 1.1rem;
-    margin-top: 2rem;
-    margin-bottom: 0rem;
     font-weight: normal;
     text-decoration: underline;
 }
 
 section p, section ul, section li {
     line-height: 1.6;
-    margin-bottom: 1rem;
     color: #cccccc;
 }
 
-section ul {
+ul {
     list-style-type: square;
 }
 

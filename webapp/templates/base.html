@@ -14,7 +14,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700&display=swap" rel="stylesheet">
     
     {# Favicon, passe den Pfad an, wenn es sich um eine statische Datei handelt #}
-    <link rel="icon" type="image/png" href="{% static 't-icon.png' %}">
+    <link rel="icon" type="image/png" href="{% static 'small-t.png' %}">
     {# Wenn icon_white.png im projektweiten static-Ordner liegt: #}
     {# <link rel="icon" type="image/png" href="{% static 'icon_white.png' %}"> #}
 
@@ -28,10 +28,7 @@
             {# Angepasst: 'home' ist jetzt 'webapp:home' #}
             <a href="{% url 'webapp:home' %}" class="logo-link"> 
                 {# logo_white.png wird als statische Datei angenommen #}
-                <img src="{% static 't-icon.png' %}" alt="logo" class="header-logo">
-                {# Oder wenn logo_white.png im projektweiten static-Ordner liegt: #}
-                {# <img src="{% static 'logo_white.png' %}" alt="Dein Firmenlogo" class="header-logo"> #}
-                <span class="site-name-text">-server.org</span>
+                <img src="{% static 'server-name.png' %}" alt="logo" class="header-logo">
             </a>
             <nav>
                 <button class="nav-toggle" id="navToggle" aria-label="Open/close menu">☰</button>
