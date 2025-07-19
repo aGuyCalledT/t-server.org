@@ -5,7 +5,7 @@
 <section>
     <h1>movie wishlist</h1>
     <p>add your favorite movies to the wishlist and see what others are looking forward to</p>
-    <form method="post" class="movie-form"> {# Angepasste Klasse #}
+    <form method="post" action="{% url 'webapp:add_movie' %}" class="movie-form">
         {% csrf_token %}
         <div class="form-group-inline"> {# Container für Titel und Jahr nebeneinander #}
             <div class="form-field-wrapper"> {# Wrapper für das Titel-Feld #}
@@ -58,7 +58,7 @@
             
             <div class="movie-actions">
                 <div class="movie-likes">
-                    <form method="post" action="{% url 'webapp:like_movie' movie_index=movie.index %}" style="display:inline;">
+                    <form method="post" action="{% url 'webapp:like_movie' movie_id=movie.unique_id %}" style="display:inline;">
                         {% csrf_token %}
                         <button type="submit" class="like-button" title="Like this movie">
                             <span class="heart-icon">♥ </span>
@@ -66,7 +66,7 @@
                     </form>
                     <span>{{ movie.likes }}</span> Likes
                 </div>
-                <form method="post" action="{% url 'webapp:delete_movie' movie_index=movie.index %}" style="display:inline;">
+                    <form method="post" action="{% url 'webapp:delete_movie' movie_id=movie.unique_id %}" style="display:inline;">
                     {% csrf_token %}
                     <button type="submit" class="delete-button" title="Delete this movie" onclick="return confirm('Are you sure you want to delete {{ movie.title }}?');">
                         remove

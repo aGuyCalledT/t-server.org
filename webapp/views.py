@@ -1,190 +1,112 @@
-from django.shortcuts import render, redirect
-from django.conf import settings
-from django.http import HttpResponse # Import hinzugefügt für Fehlerfälle
-from .forms import ContactForm, MovieForm
-import os
-import csv
-from datetime import datetime
+from django.shortcuts import render, redirect, get_object_or_404
+from django.conf import settings # Wird noch benötigt, aber CSV_FILE_PATH nicht mehr
+from django.http import HttpResponseBadRequest
+from django.contrib import messages
+from django.db import IntegrityError # Neu für Datenbankfehler
+from .forms import MovieForm, ContactForm # <--- STELL SICHER, DASS DIESE ZEILE DA IST UND ContactForm ENTHÄLT
+from .models import Movie, ContactMessage # <--- UND DIESE ZEILE MIT BEIDEN MODELS
 
-# Pfad zur CSV-Datei definieren
-CSV_FILE_PATH = os.path.join(settings.BASE_DIR, 'movies.csv')
+def wishlist_view(request):
+    movies = Movie.objects.all()
+    form = MovieForm()
+    context = {'form': form, 'movies': movies}
+    return render(request, 'wishlist.html', context)
 
-def read_movies_from_csv():
-    movies = []
-    # Prüfen, ob die Datei existiert und nicht leer ist.
-    if not os.path.exists(CSV_FILE_PATH) or os.path.getsize(CSV_FILE_PATH) == 0:
-        with open(CSV_FILE_PATH, 'w', newline='', encoding='utf-8') as csvfile:
-            writer = csv.writer(csvfile)
-            writer.writerow(['title', 'year', 'likes', 'added_date'])
-        return []
+def add_movie(request):
+    if request.method == 'POST':
+        form = MovieForm(request.POST)
+        if form.is_valid():
+            title = form.cleaned_data['title']
+            year = form.cleaned_data['year']
 
-    with open(CSV_FILE_PATH, 'r', newline='', encoding='utf-8') as csvfile:
+            # Überprüfen, ob der Film bereits existiert
+            # case__iexact für case-insensitive Vergleich des Titels
+            if Movie.objects.filter(title__iexact=title, year=year).exists():
+                messages.error(request, 'This movie is already on the wishlist.')
+                return redirect('webapp:wishlist')
+
+            try:
+                # Neuen Film erstellen und speichern (likes und added_date werden vom Model gesetzt)
+                new_movie = form.save(commit=False) # Speichert nicht sofort, damit wir unique_id etc. behandeln können
+                # unique_id und added_date werden automatisch vom Model gesetzt (siehe save-Methode und default=uuid.uuid4)
+                new_movie.save() # Jetzt speichern, nachdem alle automatischen Felder gesetzt sind
+                
+                messages.success(request, f'Movie "{new_movie.title}" added successfully!')
+            except IntegrityError: # Fängt falls unique_id aus irgendeinem Grund doch schon existiert
+                messages.error(request, 'A database error occurred. Could not add movie due to a unique constraint.')
+            except Exception as e:
+                # Fängt andere Datenbankfehler ab
+                print(f"Error adding movie to DB: {e}")
+                messages.error(request, 'Error adding movie. Please try again later.')
+            
+            return redirect('webapp:wishlist')
+        else:
+            # Formular ist nicht gültig, zeige Fehler an
+            for field, errors in form.errors.items():
+                for error in errors:
+                    messages.error(request, f"{field}: {error}")
+            if form.non_field_errors():
+                for error in form.non_field_errors():
+                    messages.error(request, error)
+            return redirect('webapp:wishlist') # Redirect, um Fehler zu zeigen
+    return HttpResponseBadRequest("Invalid request method.")
+
+
+def delete_movie(request, movie_id):
+    if request.method == 'POST':
         try:
-            reader = csv.DictReader(csvfile)
-            # Überprüfen, ob die erwarteten Spaltennamen vorhanden sind
-            expected_fieldnames = ['title', 'year', 'likes', 'added_date']
-            if not reader.fieldnames or not all(f in reader.fieldnames for f in expected_fieldnames):
-                print(f"Warning: CSV file '{CSV_FILE_PATH}' has missing or incorrect headers. Recreating file with correct headers.")
-                with open(CSV_FILE_PATH, 'w', newline='', encoding='utf-8') as new_csvfile:
-                    writer = csv.writer(new_csvfile)
-                    writer.writerow(expected_fieldnames)
-                return []
-            
-            for row in reader:
-                if all(key in row for key in expected_fieldnames):
-                    try:
-                        likes = int(row.get('likes', 0))
-                    except ValueError:
-                        likes = 0 # Fallback falls 'likes' keine Zahl ist
+            # Den Film über seine unique_id abrufen und löschen
+            movie = get_object_or_404(Movie, unique_id=movie_id)
+            movie_title = movie.title # Titel für die Erfolgsmeldung speichern
+            movie.delete()
+            messages.success(request, f'Movie "{movie_title}" deleted successfully!')
+        except Exception as e:
+            print(f"Error deleting movie from DB: {e}")
+            messages.error(request, 'Error deleting movie or movie not found.')
+        
+        return redirect('webapp:wishlist')
+    return HttpResponseBadRequest("Invalid request method.")
 
-                    added_date_display = ''
-                    if row.get('added_date'):
-                        try:
-                            # Parse das Datum im YYYY-MM-DD Format
-                            parsed_added_date = datetime.strptime(row['added_date'], '%Y-%m-%d').date()
-                            # Für die Anzeige auf der Webseite in "Sat. 12.07.2025" Format formatieren
-                            added_date_display = parsed_added_date.strftime('%a. %d.%m.%Y')
-                        except ValueError:
-                            added_date_display = row['added_date'] # Zeige es so an, wie es ist
-                            
-                    movies.append({
-                        'title': row['title'],
-                        'year': row.get('year', ''),
-                        'likes': likes,
-                        'added_date': added_date_display,
-                    })
-                else:
-                    print(f"Warning: Skipping malformed row in CSV: {row}")
-
-        except csv.Error as e:
-            print(f"Error reading CSV file '{CSV_FILE_PATH}': {e}. Recreating empty file.")
-            with open(CSV_FILE_PATH, 'w', newline='', encoding='utf-8') as csvfile:
-                writer = csv.writer(csvfile)
-                writer.writerow(['title', 'year', 'likes', 'added_date'])
-            return []
-            
-    return movies
-
-def write_movies_to_csv(movies_data):
-    # Diese Funktion schreibt die komplette Liste der Filme neu in die CSV
-    with open(CSV_FILE_PATH, 'w', newline='', encoding='utf-8') as csvfile:
-        fieldnames = ['title', 'year', 'likes', 'added_date']
-        writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
-        writer.writeheader()
-        writer.writerows(movies_data)
+def like_movie(request, movie_id):
+    if request.method == 'POST':
+        try:
+            # Den Film über seine unique_id abrufen
+            movie = get_object_or_404(Movie, unique_id=movie_id)
+            movie.likes += 1 # Like erhöhen
+            movie.save() # Änderungen speichern
+            messages.success(request, f'Movie "{movie.title}" liked successfully! Likes: {movie.likes}')
+        except Exception as e:
+            print(f"Error liking movie in DB: {e}")
+            messages.error(request, 'Error liking movie or movie not found.')
+        
+        return redirect('webapp:wishlist')
+    return HttpResponseBadRequest("Invalid request method.")
 
 
 def contact_view(request):
     if request.method == 'POST':
         form = ContactForm(request.POST)
         if form.is_valid():
-            name = form.cleaned_data['name']
-            email = form.cleaned_data['email']
-            message = form.cleaned_data['message']
-            
-            contacts_file_path = os.path.join(settings.BASE_DIR, 'contacts.txt')
-
             try:
-                with open(contacts_file_path, 'a', encoding='utf-8') as f:
-                    timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-                    f.write(f"--- Contact Entry ({timestamp}) ---\n")
-                    f.write(f"Name: {name}\n")
-                    f.write(f"Email: {email}\n")
-                    f.write(f"Message:\n{message}\n\n")
-                return redirect('webapp:contact_success')
-            except IOError as e:
-                print(f"Error writing to contacts.txt: {e}")
-                return HttpResponse("Error saving message. Please try again.", status=500)
-
-    else:
-        form = ContactForm()
-    
-    return render(request, 'contact.html', {'form': form})
-
-def contact_success_view(request):
-    return render(request, 'contact_success.html')
-
-def wishlist_view(request):
-    movies = read_movies_from_csv() # Immer die aktuelle Liste lesen
-
-    if request.method == 'POST':
-        form = MovieForm(request.POST)
-        if form.is_valid():
-            title = form.cleaned_data['title'].strip() # Leerzeichen entfernen
-            year = form.cleaned_data['year'].strip() # Leerzeichen entfernen
-            
-            # Prüfen, ob der Film bereits existiert
-            movie_exists = False
-            for movie in movies:
-                if movie['title'].lower() == title.lower(): # Case-insensitive Vergleich
-                    movie['likes'] += 1 # Bestehenden Film liken
-                    movie_exists = True
-                    break
-            
-            if not movie_exists:
-                # Neuen Film hinzufügen
-                current_date = datetime.now().strftime('%Y-%m-%d')
-                new_movie = {
-                    'title': title,
-                    'year': year,
-                    'likes': 0, # Neue Filme starten mit 0 Likes
-                    'added_date': current_date # Datum des Hinzufügens speichern
-                }
-                movies.append(new_movie)
-            
-            # Sortiere die Filme nach Likes (absteigend) und dann nach Titel (aufsteigend)
-            # Wichtig: sortiere erst, BEVOR du in die CSV schreibst, damit die Reihenfolge persistent ist
-            movies.sort(key=lambda x: (x['likes'], x['title'].lower()), reverse=True) # '.lower()' für konsistente Sortierung
-            
-            try:
-                write_movies_to_csv(movies) # Gesamte (aktualisierte) Liste neu schreiben
-                return redirect('webapp:wishlist') # Seite neu laden, um Änderungen zu sehen
-            except IOError as e:
-                print(f"Error writing to movies.csv: {e}")
-                return HttpResponse("Error adding movie. Please try again.", status=500)
-    else:
-        form = MovieForm()
-    
-    # Sortiere die Filme auch beim initialen Laden nach Likes, falls POST fehlschlägt oder GET ist
-    movies.sort(key=lambda x: (x['likes'], x['title'].lower()), reverse=True)
-
-    # Füge einen Index zu jedem Film hinzu, um ihn später im Template referenzieren zu können
-    # Der Index ist wichtig für den Like- und Delete-Button
-    movies_with_indices = [{'index': i, **movie} for i, movie in enumerate(movies)]
-
-    return render(request, 'wishlist.html', {'form': form, 'movies': movies_with_indices})
-
-
-def like_movie(request, movie_index):
-    if request.method == 'POST':
-        movies = read_movies_from_csv()
-        if 0 <= movie_index < len(movies):
-            movies[movie_index]['likes'] += 1
-            # Sortiere die Liste neu nach dem Liken
-            movies.sort(key=lambda x: (x['likes'], x['title'].lower()), reverse=True)
-            try:
-                write_movies_to_csv(movies)
-                return redirect('webapp:wishlist')
-            except IOError as e:
-                print(f"Error writing to movies.csv: {e}")
-                return HttpResponse("Error liking movie. Please try again.", status=500)
+                # Speichert die Daten des Formulars direkt in der Datenbank
+                form.save()
+                messages.success(request, 'Your message has been sent successfully!')
+                # Leite nach dem Erfolg um, um ein erneutes Senden beim Neuladen zu verhindern (Post/Redirect/Get-Pattern)
+                return redirect('webapp:contact') 
+            except Exception as e:
+                print(f"Error saving contact message to DB: {e}")
+                messages.error(request, 'There was an error sending your message. Please try again later.')
         else:
-            return HttpResponse("Movie not found.", status=404)
-    return redirect('webapp:wishlist') # Immer zur Wunschliste zurückleiten, auch bei GET
-
-
-def delete_movie(request, movie_index):
-    if request.method == 'POST': # Löschen sollte idealerweise per POST erfolgen
-        movies = read_movies_from_csv()
-        if 0 <= movie_index < len(movies):
-            del movies[movie_index] # Film aus der Liste entfernen
-            # Die Liste muss nicht neu sortiert werden, da ein Element gelöscht wurde
-            try:
-                write_movies_to_csv(movies)
-                return redirect('webapp:wishlist')
-            except IOError as e:
-                print(f"Error writing to movies.csv: {e}")
-                return HttpResponse("Error deleting movie. Please try again.", status=500)
-        else:
-            return HttpResponse("Movie not found.", status=404)
-    return redirect('webapp:wishlist') # Bei direktem GET-Zugriff auf delete_movie zur Wishlist umleiten
+            # Formular ist nicht gültig, Fehler hinzufügen
+            for field, errors in form.errors.items():
+                for error in errors:
+                    messages.error(request, f"Error in {field}: {error}")
+            if form.non_field_errors():
+                for error in form.non_field_errors():
+                    messages.error(request, error)
+            # Das Formular wird erneut mit den Fehlern gerendert
+    else:
+        form = ContactForm() # Erstellt ein leeres Formular für GET-Anfragen
+    
+    context = {'form': form}
+    return render(request, 'contact.html', context)

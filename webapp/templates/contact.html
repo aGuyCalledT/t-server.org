@@ -1,12 +1,22 @@
 {% extends "base.html" %}
-{% block title %} contact us {% endblock %}
+{% block title %} Contact Me {% endblock %}
 {% block content %}
 
 <section>
-    <h1>contact us</h1>
-    <p>Feel free to reach out to me with any questions, feedback, or project inquiries. I'll do my best to respond as soon as possible.</p>
+    <h1>Contact Me</h1>
+    <p>Feel free to send me a message.</p>
 
-    <form method="post" class="contact-form">
+    <div class="messages-container">
+        {% if messages %}
+            <ul class="messages">
+                {% for message in messages %}
+                    <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    </div>
+
+    <form method="post" action="{% url 'webapp:contact' %}" class="contact-form">
         {% csrf_token %}
         <div class="form-group">
             {{ form.name.label_tag }}
@@ -42,8 +52,7 @@
             {% endfor %}
         {% endif %}
 
-        <button type="submit" class="submit-button">send message</button>
+        <button type="submit" class="submit-button">Send Message</button>
     </form>
 </section>
-
 {% endblock %}

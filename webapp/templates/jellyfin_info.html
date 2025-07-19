@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Jellyfin Anleitung - t-server.org{% endblock title %}
+
+{% block extra_head %}
+    {# Spezifisches CSS für den Wikipedia-Stil #}
+    <link rel="stylesheet" href="{% static 'wiki.css' %}">
+{% endblock extra_head %}
+
+{% block content %}
+    {# Der feste Bilder-Container ist hier platziert, seine Positionierung wird durch CSS geregelt #}
+    <div class="wiki-image-sidebar">
+        <img src="{% static 'movie.png' %}" alt="Jellyfin Logo" class="wiki-sidebar-image">
+        <p>Jellyfin Logo</p>
+        <img src="{% static 'movie.png' %}" alt="Jellyfin Icon" class="wiki-sidebar-image">
+        <p>Jellyfin Icon Beispiel</p>
+        {# Hier kannst du beliebig viele weitere Bilder hinzufügen #}
+    </div>
+
+    <div class="wiki-content-flex-container"> {# Enthält Inhaltsübersicht und Hauptartikel #}
+        <div class="wiki-toc">
+            <h2>Inhaltsübersicht</h2>
+            <ul class="wiki-toc-list">
+                {# Kombinierte Plattform-Links und Abschnitts-Sprunglinks #}
+                <li><a href="#definition">Was ist Jellyfin?</a></li>
+                <li><a href="#android">Jellyfin auf Android</a></li>
+                <li><a href="#iphone">Jellyfin auf iPhone</a></li>
+                <li><a href="#smart-tv">Jellyfin auf Smart-TV</a></li>
+                <li><a href="#windows">Jellyfin auf Windows</a></li>
+                <li><a href="#browser">Jellyfin im Browser</a></li>
+            </ul>
+        </div>
+
+        <div class="wiki-article-container"> {# Enthält Einleitung und Artikelabschnitte #}
+            <div class="wiki-intro-section">
+                <h1>Jellyfin: Ihr persönliches Medienzentrum</h1>
+                <p class="wiki-paragraph">Jellyfin ist eine kostenlose und quelloffene Mediaserver-Software, die es Ihnen ermöglicht, Ihre Filme, Serien, Musik und Fotos zentral zu verwalten und auf einer Vielzahl von Geräten zu streamen. Es bietet eine leistungsstarke und flexible Lösung für die Organisation Ihrer digitalen Mediensammlung, vergleichbar mit kommerziellen Alternativen, jedoch völlig werbefrei und ohne versteckte Kosten. Mit Jellyfin behalten Sie die volle Kontrolle über Ihre Daten und genießen Ihre Medieninhalte jederzeit und überall.</p>
+            </div>
+
+            <hr class="wiki-divider">
+
+            <div class="wiki-article-sections"> {# Umfasst die eigentlichen Artikelabschnitte #}
+                <h2 id="definition" class="wiki-heading">Was ist Jellyfin?</h2>
+                <p class="wiki-paragraph">Jellyfin ist eine plattformübergreifende Mediaserver-Anwendung, die es Ihnen ermöglicht, Ihre gesamte Medienbibliothek – bestehend aus Filmen, Fernsehsendungen, Musik und Fotos – an einem zentralen Ort zu speichern und für den Zugriff von überall und jedem Gerät bereitzustellen. Als Fork von Emby und Plex ist Jellyfin vollständig Open Source und gemeinnützig entwickelt, was bedeutet, dass es keine Premium-Features, Abonnements oder versteckte Datenerfassung gibt. Es bietet Funktionen wie Live-TV und DVR, automatische Metadaten-Erkennung für Ihre Medien, Fernzugriff über das Internet und Unterstützung für eine Vielzahl von Clients, einschließlich Webbrowser, mobile Apps, Smart-TVs und Streaming-Geräte. Die Flexibilität und die aktive Community-Entwicklung machen Jellyfin zu einer beliebten Wahl für Nutzer, die Wert auf Kontrolle und Anpassungsfähigkeit legen.</p>
+
+                <h2 id="android" class="wiki-heading">Jellyfin auf Android</h2>
+                <p class="wiki-paragraph">Die Jellyfin-App für Android ermöglicht Ihnen den bequemen Zugriff auf Ihre persönliche Medienbibliothek direkt von Ihrem Smartphone oder Tablet aus. Die Installation und anschließende Verbindung mit Ihrem Jellyfin-Server sind unkompliziert und in wenigen Schritten erledigt.</p>
+
+                <h3 class="wiki-heading">Installation und Verbindung</h3>
+                <p class="wiki-paragraph">Um die Jellyfin-App zu installieren, öffnen Sie zunächst den **Google Play Store** auf Ihrem Android-Gerät. Nutzen Sie die Suchleiste, um nach "Jellyfin" zu suchen. Achten Sie auf die offizielle App, die durch ihr weißes Logo mit einem lila "J" gekennzeichnet ist, und tippen Sie dann auf "Installieren", um den Download und die Einrichtung abzuschließen.</p>
+                <p class="wiki-paragraph">Nach erfolgreicher Installation starten Sie die Jellyfin-App. Beim ersten Öffnen werden Sie zur Eingabe der Serveradresse aufgefordert. Geben Sie hier die vollständige URL Ihres Jellyfin-Servers ein: <code>https://t-server.org/jellyfin</code>. Es ist wichtig, den <code>https://</code>-Teil und den benutzerdefinierten Pfad <code>/jellyfin</code> am Ende exakt einzugeben. Bestätigen Sie Ihre Eingabe, woraufhin die App Sie zur Anmeldeseite Ihres Servers weiterleiten sollte. Melden Sie sich dort mit Ihrem Jellyfin-Benutzernamen und dem dazugehörigen Passwort an.</p>
+
+                <h3 class="wiki-heading">Medienwiedergabe</h3>
+                <p class="wiki-paragraph">Nachdem Sie sich erfolgreich angemeldet haben, gelangen Sie zum Haupt-Dashboard Ihres Jellyfin-Servers. Dieses ist übersichtlich gestaltet und zeigt Ihnen Ihre verschiedenen Bibliotheken wie Filme, Serien, Musik und Fotos an, genau wie Sie es von der Web-Oberfläche gewohnt sind. Wählen Sie einfach die gewünschte Bibliothek aus, tippen Sie auf den gewünschten Inhalt (Film, Serie etc.), um dessen Details anzusehen, und starten Sie die Wiedergabe über den "Abspielen"-Button.</p>
+
+                <h3 class="wiki-heading">Häufige Probleme und Lösungen</h3>
+                <ul class="wiki-paragraph">
+                    <li>**Server nicht erreichbar oder Verbindungsfehler:**
+                        Überprüfen Sie zunächst die eingegebene Server-URL (<code>https://t-server.org/jellyfin</code>) auf exakte Korrektheit. Stellen Sie sicher, dass Ihr Mobilgerät über eine aktive Internetverbindung verfügt und Ihr Server (t-server.org) tatsächlich erreichbar ist – ein Test im Handy-Browser kann hier Klarheit schaffen. Vergewissern Sie sich zudem, dass auf Ihrem Server sowohl Apache (prüfbar mit <code>sudo systemctl status httpd</code>) als auch der Jellyfin-Docker-Container (<code>sudo docker ps</code>) aktiv und fehlerfrei laufen.
+                    </li>
+                    <li>**Anmeldeprobleme:**
+                        Kontrollieren Sie Ihren Jellyfin-Benutzernamen und das Passwort sorgfältig und achten Sie dabei auf Groß- und Kleinschreibung.
+                    </li>
+                    <li>**Wiedergabeprobleme:**
+                        Fehler bei der Wiedergabe können manchmal durch Inkompatibilitäten mit bestimmten Codecs verursacht werden. Obwohl die Jellyfin-App viele Formate nativ unterstützt, kann bei speziellen Dateiformaten die Hardware-Beschleunigung Ihres Geräts eine Rolle spielen. Ein Neustart der App oder des Handys kann hier oft Abhilfe schaffen. Bei häufigen Problemen mit der Transkodierung ist es ratsam, die Leistungsfähigkeit Ihrer Server-Hardware zu überprüfen.
+                    </li>
+                </ul>
+                <p class="wiki-paragraph">Diese Hinweise sollten Ihnen helfen, Ihre Inhalte schnell und reibungslos zu genießen. Viel Spaß beim Streamen!</p>
+
+                <h2 id="iphone" class="wiki-heading">Jellyfin auf iPhone</h2>
+                <p class="wiki-paragraph">Erfahren Sie, wie Sie Jellyfin auf Ihrem iPhone einrichten und Ihre Medien unterwegs genießen können. Eine Schritt-für-Schritt-Anleitung folgt in Kürze.</p>
+                
+                <h2 id="smart-tv" class="wiki-heading">Jellyfin auf Smart-TV</h2>
+                <p class="wiki-paragraph">Diese Sektion wird Anweisungen zum Installieren und Verwenden der Jellyfin-App auf verschiedenen Smart-TV-Plattformen (z.B. Android TV, Roku, Fire TV) enthalten.</p>
+                
+                <h2 id="windows" class="wiki-heading">Jellyfin auf Windows</h2>
+                <p class="wiki-paragraph">Eine umfassende Anleitung zur Einrichtung des Jellyfin-Servers und der Clients auf Windows-Systemen, inklusive Server-Konfiguration und Medienmanagement.</p>
+                
+                <h2 id="browser" class="wiki-heading">Jellyfin im Browser</h2>
+                <p class="wiki-paragraph">Lernen Sie, wie Sie über jeden gängigen Webbrowser auf Ihren Jellyfin-Server zugreifen und Ihre Medien streamen können – ideal für den schnellen Zugriff ohne Installation.</p>
+            </div>
+        </div>
+    </div>
+{% endblock content %}

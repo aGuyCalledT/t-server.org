@@ -1,10 +1,25 @@
 from django import forms
+from .models import Movie
+from .models import ContactMessage
 
-class ContactForm(forms.Form):
-    name = forms.CharField(max_length=100, label="Your Name", required=True)
-    email = forms.EmailField(label="Your Email", required=True)
-    message = forms.CharField(widget=forms.Textarea, label="Your Message", required=True)
+class MovieForm(forms.ModelForm):
+    class Meta:
+        model = Movie
+        fields = ['title', 'year']
+        labels = {
+            'title': "Title",
+            'year': "Year"}
 
-class MovieForm(forms.Form):
-    title = forms.CharField(max_length=200, label="Title", required=True)
-    year = forms.CharField(max_length=4, label="Year", required=False)
+
+class ContactForm(forms.ModelForm):
+    class Meta:
+        model = ContactMessage
+        fields = ['name', 'email', 'message']
+        labels = {
+            'name': "Your Name",
+            'email': "Your Email",
+            'message': "Your Message",
+        }
+        widgets = {
+            'message': forms.Textarea(attrs={'rows': 5}),
+        }
