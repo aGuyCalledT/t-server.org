@@ -1,0 +1,18 @@
+--- Contact Entry (2025-07-12 13:02:22) ---
+Name: Julius Caesar
+Email: iililliii@outlook.de
+Message:
+Hallo!
+
+--- Contact Entry (2025-07-17 10:12:51) ---
+Name: test
+Email: lol@what.com
+Message:
+lol
+
+--- Contact Entry (2025-07-19 08:38:05) ---
+Name: tesdt
+Email: stest@sda.ds
+Message:
+easesd
+

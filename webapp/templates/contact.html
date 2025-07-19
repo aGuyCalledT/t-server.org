@@ -1,20 +1,10 @@
 {% extends "base.html" %}
-{% block title %} Contact Me {% endblock %}
+{% block title %} contact me {% endblock %}
 {% block content %}
 
 <section>
-    <h1>Contact Me</h1>
+    <h1>contact me</h1>
     <p>Feel free to send me a message.</p>
-
-    <div class="messages-container">
-        {% if messages %}
-            <ul class="messages">
-                {% for message in messages %}
-                    <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
-                {% endfor %}
-            </ul>
-        {% endif %}
-    </div>
 
     <form method="post" action="{% url 'webapp:contact' %}" class="contact-form">
         {% csrf_token %}

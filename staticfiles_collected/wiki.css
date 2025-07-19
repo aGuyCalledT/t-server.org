@@ -1,0 +1,206 @@
+body {
+    background-color: var(--background-color); /* Dunkler Hintergrund von base.html */
+    color: var(--text-color); /* Weißer Text von base.html */
+}
+
+/* Override default header sticky behavior for full width content below */
+header {
+    box-shadow: none; /* Schatten entfernen, um sich besser in die Seite einzufügen */
+    border-bottom: 1px solid var(--border-color); /* Dunklerer Rand, passend zum dunklen Thema */
+    position: relative; /* Nicht klebrig, damit der Inhalt natürlich fließt */
+    background-color: var(--surface-color); /* Dunklerer Header-Hintergrund von base.html */
+    color: var(--text-color); /* Weißer Text für Header-Links usw. */
+}
+
+/* Sicherstellen, dass Links im Header sichtbar sind */
+header a {
+    color: var(--text-color);
+}
+
+/* Hauptinhalts-Wrapper zur Steuerung der gesamten Seitenbreite und des Paddings */
+/* Dieser umschließt nun die Inhaltsübersicht und den Hauptartikelbereich */
+.wiki-content-flex-container {
+    max-width: 1200px; /* Breiterer Inhaltsbereich wie bei Wikipedia */
+    margin: 0 auto; /* Inhaltsbereich zentrieren */
+    padding: 2rem 1.5rem; /* Padding für den gesamten Inhalt */
+    display: flex;
+    align-items: flex-start; /* Elemente oben ausrichten */
+    gap: 2rem; /* Abstand zwischen Inhaltsübersicht und Artikel */
+}
+
+/* Inhaltsübersicht (Navigationsbox) Stile */
+.wiki-toc {
+    width: 250px; /* Etwas breitere Inhaltsübersicht für bessere Lesbarkeit */
+    border: 1px solid var(--border-color); /* Dunkler Rand */
+    background-color: var(--surface-color); /* Dunkler Hintergrund */
+    padding: 1em;
+    box-sizing: border-box;
+    flex-shrink: 0; /* Verhindern, dass es schrumpft */
+    color: var(--text-color); /* Weißer Text */
+}
+
+.wiki-toc h2 {
+    font-size: 1.2em;
+    margin-top: 0;
+    margin-bottom: 1em;
+    text-align: center;
+    color: var(--text-color); /* Weißer Text */
+    border-bottom: 1px solid var(--border-color); /* Horizontale Linie für die TOC-Überschrift */
+    padding-bottom: 0.5em;
+}
+
+.wiki-toc-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.wiki-toc-list li {
+    margin-bottom: 0.5em;
+    line-height: 1.4;
+}
+
+.wiki-toc-list a {
+    color: #8ab4f8; /* Wikipedia Dark Mode Linkfarbe */
+    text-decoration: none;
+}
+
+.wiki-toc-list a:hover {
+    text-decoration: underline;
+}
+
+/* Artikel-Container (Hauptinhaltsbereich für Einleitung und Abschnitte) */
+.wiki-article-container {
+    flex-grow: 1; /* Nimmt den verbleibenden Platz ein */
+    min-width: 0; /* Ermöglicht Schrumpfung */
+    padding-right: 320px; /* Platz für die feststehende Bilder-Sidebar */
+}
+
+/* Stile für den Einleitungsabschnitt */
+.wiki-intro-section {
+    margin-bottom: 2rem;
+}
+
+/* Feststehende Bilder-Sidebar */
+.wiki-image-sidebar {
+    position: fixed;
+    top: 80px; /* Anpassen basierend auf der tatsächlichen Höhe deines Headers */
+    right: 0;
+    width: 300px; /* Breite der Sidebar */
+    height: calc(100vh - 80px); /* Höhe anpassen, um den Header nicht zu überlappen */
+    overflow-y: auto; /* Scrollen, wenn der Inhalt überläuft */
+    background-color: var(--surface-color); /* Dunkler Hintergrund */
+    border-left: 1px solid var(--border-color); /* Dunkler Rand */
+    padding: 1.5rem 1rem;
+    box-sizing: border-box;
+    z-index: 100; /* Sicherstellen, dass sie über anderem Inhalt liegt */
+}
+
+.wiki-sidebar-image {
+    max-width: 100%;
+    height: auto;
+    display: block;
+    margin-bottom: 1rem; /* Abstand zwischen Bildern */
+    border: 1px solid var(--border-color); /* Rand für Bilder */
+}
+
+.wiki-image-sidebar p {
+    font-size: 0.9em;
+    text-align: center;
+    color: var(--secondary-text-color); /* Hellerer Text für Beschreibungen */
+    margin-top: -0.5rem;
+    margin-bottom: 1.5rem;
+}
+
+/* Trennlinie */
+.wiki-divider {
+    border: 0;
+    height: 1px;
+    background-color: var(--border-color); /* Dunkler Rand */
+    margin: 2rem 0;
+}
+
+/* Allgemeine Textausrichtung und Blocksatz für den Hauptinhalt */
+.wiki-article-container h1 {
+    text-align: left;
+    color: var(--text-color);
+    font-family: 'Grenze', serif;
+    margin-top: 0; /* Oberen Rand für die Hauptüberschrift entfernen */
+    margin-bottom: 0.5em;
+}
+
+.wiki-heading { /* Gilt für h2, h3 usw. innerhalb der Artikelabschnitte */
+    text-align: left; /* Überschriften linksbündig */
+    color: var(--text-color); /* Weißer Text */
+    font-family: 'Grenze', serif; /* Grenzer-Schriftart für Überschriften beibehalten */
+    margin-top: 2em; /* Etwas Platz über den Überschriften hinzufügen */
+    margin-bottom: 0.5em; /* Etwas Platz unter den Überschriften hinzufügen */
+    border-bottom: 1px solid var(--border-color); /* Horizontale Linie für Überschriften */
+    padding-bottom: 0.2em; /* Abstand zwischen Text und Linie */
+}
+
+.wiki-paragraph {
+    text-align: justify; /* Blocksatz */
+    line-height: 1.6;
+    color: var(--text-color); /* Weißer Text */
+    margin-bottom: 1em; /* Abstand zwischen Absätzen */
+}
+
+/* Anpassungen für Standard-Body/Main-Stile aus style.css */
+#content-wrapper {
+    background-color: transparent; /* Hintergrund vom Wrapper entfernen */
+    display: block; /* Sicherstellen, dass es sich wie ein Block verhält */
+    position: relative; /* Ermöglicht untergeordneten feststehenden Elementen, relativ zum Body zu sein */
+}
+
+main {
+    padding: 0 !important; /* Padding von main entfernen, für volle Breitenkontrolle */
+    justify-content: flex-start !important; /* Inhalt nach oben ausrichten */
+    align-items: flex-start !important; /* Inhalt nach links ausrichten */
+    text-align: left !important; /* Sicherstellen, dass Text linksbündig ist */
+    background-color: transparent !important; /* Sicherstellen, dass der Haupt-Hintergrund transparent ist */
+}
+
+/* Sicherstellen, dass Standard-Linkfarben im Dark Mode sichtbar sind */
+a {
+    color: #8ab4f8; /* Wikipedia Dark Mode Linkfarbe */
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+/* Media Queries für Responsivität */
+@media (max-width: 1024px) {
+    .wiki-image-sidebar {
+        display: none; /* Bilder-Sidebar auf kleineren Bildschirmen ausblenden */
+    }
+    .wiki-article-container {
+        padding-right: 0; /* Padding entfernen, wenn Sidebar ausgeblendet ist */
+    }
+}
+
+@media (max-width: 768px) {
+    .wiki-content-flex-container {
+        flex-direction: column; /* Inhaltsübersicht und Artikel vertikal stapeln */
+        padding: 1rem;
+    }
+
+    .wiki-toc {
+        width: 100%; /* Inhaltsübersicht nimmt volle Breite ein */
+        margin-right: 0; /* Rand entfernen */
+        margin-bottom: 1.5rem; /* Abstand unter der Inhaltsübersicht hinzufügen */
+        float: none; /* Float entfernen */
+    }
+
+    .wiki-article-container {
+        width: 100%; /* Artikel nimmt volle Breite ein */
+    }
+
+    .wiki-article-container h1,
+    .wiki-heading,
+    .wiki-paragraph {
+        text-align: left; /* Sicherstellen, dass Text linksbündig bleibt */
+    }
+}

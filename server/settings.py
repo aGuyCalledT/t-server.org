@@ -14,11 +14,10 @@ from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', "django-insecure-t(#c7!+_0lq!b@$=b)y)&#e%7zuu2zycw4@@)6^^k^lxv&b_1g")
-DEBUG = True
+DEBUG = False # KRITISCH KORRIGIERT: 'False' muss mit kleinem 'f' geschrieben werden!
 
-ALLOWED_HOSTS = None
-if not ALLOWED_HOSTS:
-    ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
+# KRITISCH KORRIGIERT: t-server.org und www.t-server.org hinzugefügt, da DEBUG = False ist.
+ALLOWED_HOSTS = ['t-server.org', 'www.t-server.org', '127.0.0.1', 'localhost']
 
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -87,10 +86,13 @@ USE_I18N = True
 USE_TZ = True
 
 STATIC_URL = "/static/"
-STATICFILES_DIRS = [
-        os.path.join(BASE_DIR, 'static')
-        ]
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles_collected')
+# KORRIGIERT: Leere Liste, um Fehler E002 zu beheben.
+# Django sammelt immer noch statische Dateien aus 'static/' Ordnern deiner Apps.
+STATICFILES_DIRS = []
+
+# Dieser Pfad MUSS mit dem Alias in Django.conf übereinstimmen: /srv/http/Django/static/
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
